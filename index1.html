@@ -132,40 +132,46 @@
         }
         
 @media print {
-            /* 1. ซ่อนทุกอย่างในหน้าเว็บ ยกเว้นใบประกาศ ไม่ให้เหลือพื้นที่ว่าง */
+            /* 1. ซ่อนเนื้อหาอื่นนอกเหนือจากใบประกาศ */
             body > *:not(#certificate-wrapper) {
                 display: none !important;
             }
+            
+            /* 2. บังคับซ่อนปุ่มทุุกชนิดและลิงก์ตอนสั่งพรินต์ */
+            #certificate-wrapper button, 
+            #certificate-wrapper a {
+                display: none !important;
+            }
+            
             body {
                 background: #fff;
                 margin: 0;
                 padding: 0;
             }
-            /* 2. จัดใบประกาศให้อยู่กึ่งกลางหน้าพอดี */
+            
+            /* 3. จัดกึ่งกลางหน้ากระดาษใหม่แบบเสถียรสุด */
             #certificate-wrapper {
-                display: flex !important;
-                justify-content: center;
-                align-items: center;
+                display: block !important;
                 width: 100%;
-                height: 100vh; /* ให้สูงเต็ม 1 หน้ากระดาษ */
+                text-align: center;
                 margin: 0;
-                padding: 0;
+                padding: 20px 0; /* เพิ่มพื้นที่ด้านบนนิดหน่อยให้ดูสวยงาม */
             }
-            /* 3. ลบเงาและป้องกันการโดนตัดครึ่งหน้า */
+            
             #certificate {
+                display: inline-block !important; /* ให้ทำงานร่วมกับ text-align: center */
                 position: relative !important;
-                transform: none !important;
-                left: auto !important;
-                top: auto !important;
                 width: 95% !important;
                 max-width: 1000px !important;
+                margin: 0 auto !important;
                 box-shadow: none !important;
                 page-break-inside: avoid;
             }
-            /* 4. ตั้งค่าหน้ากระดาษเป็น A4 แนวนอน */
+            
+            /* 4. ปรับหน้ากระดาษ และตั้ง margin: 0 เพื่อซ่อนวันที่/URL ของเบราว์เซอร์ */
             @page {
                 size: A4 landscape;
-                margin: 1cm;
+                margin: 0mm; 
             }
         }
     </style>
