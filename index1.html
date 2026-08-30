@@ -131,21 +131,41 @@
             font-weight: bold;
         }
         
-        @media print {
-            body { background: #fff; }
-            body * { visibility: hidden; }
-            #certificate, #certificate * { visibility: visible; }
-            #certificate {
-                position: absolute;
-                left: 50%;
-                top: 40%;
-                transform: translate(-50%, -50%);
-                width: 100%;
-                box-shadow: none;
+@media print {
+            /* 1. ซ่อนทุกอย่างในหน้าเว็บ ยกเว้นใบประกาศ ไม่ให้เหลือพื้นที่ว่าง */
+            body > *:not(#certificate-wrapper) {
+                display: none !important;
             }
+            body {
+                background: #fff;
+                margin: 0;
+                padding: 0;
+            }
+            /* 2. จัดใบประกาศให้อยู่กึ่งกลางหน้าพอดี */
+            #certificate-wrapper {
+                display: flex !important;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                height: 100vh; /* ให้สูงเต็ม 1 หน้ากระดาษ */
+                margin: 0;
+                padding: 0;
+            }
+            /* 3. ลบเงาและป้องกันการโดนตัดครึ่งหน้า */
+            #certificate {
+                position: relative !important;
+                transform: none !important;
+                left: auto !important;
+                top: auto !important;
+                width: 95% !important;
+                max-width: 1000px !important;
+                box-shadow: none !important;
+                page-break-inside: avoid;
+            }
+            /* 4. ตั้งค่าหน้ากระดาษเป็น A4 แนวนอน */
             @page {
-                size: landscape;
-                margin: 0mm;
+                size: A4 landscape;
+                margin: 1cm;
             }
         }
     </style>
