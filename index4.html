@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>แบบทดสอบ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* โค้ด CSS สไตล์เดิม */
+        body {
+            font-family: 'Sarabun', sans-serif;
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: #f9faff;
+            color: #333;
+            padding: 20px;
+        }
+        h2 {
+            color: #004080;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .question-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .question h3 {
+            color: #0059b3;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .choices {
+            list-style: none;
+            padding: 0;
+        }
+        .choices li {
+            margin-bottom: 8px;
+        }
+        .choices label {
+            display: block;
+            background: #e6f2ff;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .choices label:hover {
+            background-color: #cce6ff;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            font-size: 1.1rem;
+            background-color: #007acc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 20px auto 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        button:hover {
+            background-color: #005fa3;
+        }
+        #result {
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            font-size: 1.2rem;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .loading-text {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            margin-top: 50px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>แบบทดสอบปรนัย: PRUMhao Mhao Double Sure (25 ข้อ)</h2>
+
+    <div id="loading" class="loading-text">กำลังโหลดแบบทดสอบ...</div>
+
+    <div style="margin-bottom: 20px;"><label for="name">ชื่อผู้ทำแบบทดสอบ:</label><input type="text" id="name" name="name" required style="width:100%;padding:10px;margin-top:5px;"></div>
+<form id="quizForm" class="hidden"></form>
+
+    <button id="submitBtn" class="hidden">ส่งคำตอบ</button>
+
+    <div id="result"></div>
+    
+    <a href="index4.html">
+        <button style="margin-top: 20px;">ไปหน้าถัดไป</button>
+    </a>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // --- Supabase Setup ---
+        const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+
+        // ข้อมูลคำถาม (ใช้ข้อมูลเดิมทั้งหมด)
+const questions = [
+    { q: "1. “ผลประโยชน์สูงสุดต่อปี” หมายถึงอะไร?", a: "B", choices: ["วงเงินสูงสุดที่จ่ายต่อครั้ง", "วงเงินสูงสุดที่จ่ายต่อปีตามแผนที่เลือก", "วงเงินสูงสุดที่จ่ายต่อวัน", "วงเงินสูงสุดที่จ่ายต่อเดือน"] },
+    { q: "2. แผน 5 แสน มีค่าห้องผู้ป่วยในต่อวันเท่าไร?", a: "B", choices: ["2,000 บาท", "2.500 บาท", "5,000 บาท", "6,000 บาท"] },
+    { q: "3. แผน 2 ล้าน มีค่าห้องผู้ป่วยในต่อวันเท่าไร?", a: "D", choices: ["3,000 บาท", "4,000 บาท", "5,000 บาท", "6,000 บาท"] },
+    { q: "4. หมวด 1 ครอบคลุมอะไร?", a: "B", choices: ["ค่าห้อง ICU", "ค่าห้องและอาหารผู้ป่วยใน", "ค่ารักษาพยาบาลทั่วไป", "ค่าผ่าตัดเล็ก"] },
+    { q: "5. หมวด 2 ครอบคลุมอะไร?", a: "A", choices: ["ค่าวินิจฉัยและบำบัดรักษาพยาบาล", "ค่าห้องผู้ป่วยใน", "ค่ารักษาพยาบาลแบบ Day Surgery", "ค่ารักษาพยาบาลกรณีอุบัติเหตุ"] },
+    { q: "6. หมวด 3 ครอบคลุมค่าใช้จ่ายประเภทใด?", a: "B", choices: ["ค่าห้อง ICU", "ค่าแพทย์เยี่ยมไข้", "ค่ารักษาพยาบาลแบบ Day Surgery", "ค่ารักษาพยาบาลกรณีอุบัติเหตุ"] },
+    { q: "7. หมวด 5 ให้ความคุ้มครองในกรณีใด?", a: "B", choices: ["ค่าห้อง ICU", "ค่ารักษาพยาบาลแบบ Day Surgery", "ค่ารักษาพยาบาลกรณีอุบัติเหตุ", "ค่ารักษาพยาบาลแบบ Day Case"] },
+    { q: "8. หมวด 7 ให้ความคุ้มครองในกรณีใด?", a: "A", choices: ["อุบัติเหตุฉุกเฉิน ภายใน 24 ชั่วโมง", "ผ่าตัดเล็ก", "ค่าห้อง ICU", "ค่ารักษาพยาบาลกรณีทำฟัน"] },
+    { q: "9. หมวด 9 ครอบคลุมค่าใช้จ่ายประเภทใด?", a: "A", choices: ["ค่าล้างไตผ่านเส้นเลือด", "ค่ากายภาพบำบัด", "ค่ารักษาพยาบาลแบบ Day Surgery", "ค่าห้อง ICU"] },
+    { q: "10. หมวด 11 ครอบคลุมอะไร?", a: "C", choices: ["ทำคีโมมะเร็งผิวหนัง", "ฉายแสงหลังผ่าตัดไส้ติ่ง", "หลังจากทำคีโมหมอแนะนำให้ทำ target therapy", "ผ่าตัดเล็ก"] },
+    { q: "11. แผน 8 แสน ค่าห้อง ICU ต่อวันเท่าไร?", a: "D", choices: ["2,000 บาท", "3,000 บาท", "5,000 บาท", "6,000 บาท"] },
+    { q: "12. ถ้าลูกค้าเลือกแผน 1 ล้าน และนอนโรงพยาบาล 10 วัน ค่าห้องรวมเท่าไร?", a: "C", choices: ["30,000 บาท", "40,000 บาท", "50,000 บาท", "60,000 บาท"] },
+    { q: "13. เงื่อนไขการจ่ายค่าห้องผู้ป่วยในสูงสุดกี่วันต่อปี?", a: "A", choices: ["365 วัน", "60 วัน", "90 วัน", "120 วัน"] },
+    { q: "14. เงื่อนไขการจ่ายค่าห้อง ICU สูงสุดกี่วันต่อปี?", a: "A", choices: ["90 วัน", "99 วัน", "30 วัน", "60 วัน"] },
+    { q: "15. หมวด 6 ครอบคลุมอะไร?", a: "C", choices: ["ค่ายา 30 วันหลังจาก IPD", "ค่าวินิจฉัยก่อนเข้า IPD ด้วยสาเหตุเดียวกัน 30 วัน", "ค่า Follow หลัง IPD ด้วยสาเหตุเดียวกัน 30 วัน", "B และ C ถูก"] },
+    { q: "16. ถ้าลูกค้าเลือกแผน 2 ล้าน และมีค่ารักษาพยาบาลรวม 1.8 ล้าน จะได้รับการจ่ายเต็มหรือไม่?", a: "D", choices: ["ไม่จ่าย", "จ่ายบางส่วน", "จ่ายเต็ม", "ขึ้นอยู่กับเงื่อนไขหมวด 1"] },
+    { q: "17. หมวด 8 ให้ความคุ้มครองในกรณีใด?", a: "D", choices: ["เจ็บป่วย IPD", "อุบัติเหตุจากการขับขี่จักรยานยนต์ IPD", "โรคร้าย IPD", "ถูกทุกข้อ"] },
+    { q: "18. หมวด 12 ครอบคลุมอะไร?", a: "C", choices: ["อุบัติเหตุจากการเล่นกีฬา", "อุบัติเหตุจากการขับขี่จักรยานยนต์", "เจ็บป่วยและอุบัติเหตุฉุกเฉิน", "ผ่าตัดเล็ก"] },
+    { q: "19. ถ้าลูกค้าเลือกแผน 5 แสน และเข้ารับการรักษาแบบ Day Surgery จะได้รับวงเงินสูงสุดเท่าไร?", a: "B", choices: ["300,000 บาท", "500,000 บาท", "800,000 บาท", "1,000,000 บาท"] },
+    { q: "20. ทำไมต้องเลือกแผนที่เหมาะสมกับความต้องการของลูกค้า?", a: "B", choices: ["เพื่อให้จ่ายเบี้ยประกันน้อยที่สุด", "เพื่อให้ได้รับความคุ้มครองเพียงพอและลดความเสี่ยงค่าใช้จ่ายส่วนเกิน", "เพื่อให้ได้สิทธิพิเศษจากโรงพยาบาล", "เพื่อให้ได้วงเงินสูงสุดเท่านั้น"] },
+    { q: "21.Bonus No Clam มีเงื่อนไขอย่างไร?", a: "B", choices: ["ไม่เคลมทุกปีมีส่วนลด 10%", "ไม่เคลมต่อเนื่อง 2 ปีมีส่วนลด 10%", "ไม่เคลมต่อเนื่อง 2 ปี มีเงินคืนให้ 10%", "ไม่มีข้อถูก"] },
+    { q: "22. Deductible คืออะไร", a: "C", choices: ["ความรับผิดส่วนแรกของการซื้อประกัน", "เงินส่วนแรกที่ต้องจ่ายเบี้ยประกัน", "ค่าใช้จ่ายส่วนแรกของค่ารักษาพยาลาลที่ต้องจ่ายก่อนเคลม", "ค่าบริการส่วนแรกของ ร.พ."] },
+    { q: "23. รัตนาต้องการซื้อ พรูเหมาเหมาดับเบิลชัวร์ ให้กับลูกชายอายุ 5 ขวบ เราจะอธิบายว่าอย่างไร?", a: "C", choices: ["สามารถทำได้แบบ Full Coverage", "สามารถทำได้แบบ Deductible", "ต้องรอให้บุตรอายุครบ 6 ปีก่อนถึงสามารถทำได้", "คุณรัตนาต้องทำก่อนถึงสามารถทำให้บุตรได้"] },
+    { q: "24. หากได้รับการแจ้งจาก บริษัทว่าปีถัดไปจะต้องมีส่วนร่วมจ่ายค่ารักษาพยาบาล และได้ซื้อแบบ Deductible ไว้หากต้องการเคลมขอไดอธิบายถูกต้อง?", a: "B", choices: ["จ่าย ส่วนร่วมจายก่อนค่อยจ่าย Deductible", "จ่าย Deductible ค่อยจ่าย ส่วนร่วมจ่าย", "จ่ายพร้อมกัน", "ถูกทุกข้อ"] },
+    { q: "25. หากเคลมค่ารักษามาตรฐานจนหมด เหลือเพียงตัวท็อปอัพโรคร้ายแรง เกิดอุบัติเหตุต้องเข้ารักษาตัวใน รพ. จะสามาถใช้วงเงินค่ารักษาได้หรือไม่", a: "C", choices: ["ใช้ได้ปกติ", "สามารถใช้ตัวท็อปอัพโรคร้ายรักษาไปก่อนได้", "ยังไม่สารมารถใช้วงเงินค่ารักษามาตรฐานได้เนื่องจากได้ใช้หมดไปแล้วแนะนำลูกค้าใช้สวัสอดิการณ์ตัวอื่นก่อน", "ขอใช้วงเงินล่วงหน้าก่อนได้"] }
+]; // --- DOM Elements ---
+    const quizForm = document.getElementById('quizForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const loading = document.getElementById('loading');
+    const resultDiv = document.getElementById('result');
+
+    // โหลดชื่อ และ ประสบการณ์ จาก Session / URL มาใส่ใน Input อัตโนมัติ (ถ้ามี)
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const storedName = urlParams.get('name') || sessionStorage.getItem('user_name');
+        if (storedName) {
+            document.getElementById('name').value = storedName;
+        }
+    });
+
+    function renderQuiz() {
+        loading.classList.add('hidden');
+        quizForm.classList.remove('hidden');
+        submitBtn.classList.remove('hidden');
+
+        questions.forEach((q, index) => {
+            const container = document.createElement('div');
+            container.className = 'question-container';
+
+            const questionTitle = document.createElement('h3');
+            questionTitle.textContent = q.q;
+            container.appendChild(questionTitle);
+
+            const ul = document.createElement('ul');
+            ul.className = 'choices';
+
+            q.choices.forEach((choice, i) => {
+                const li = document.createElement('li');
+                const label = document.createElement('label');
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = `question-${index}`;
+                input.value = String.fromCharCode(65 + i);
+                label.appendChild(input);
+                label.appendChild(document.createTextNode(`${input.value}. ${choice}`));
+                li.appendChild(label);
+                ul.appendChild(li);
+            });
+
+            container.appendChild(ul);
+            quizForm.appendChild(container);
+        });
+    }
+    
+    async function initialize() {
+        try {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (user) {
+                currentUser = user;
+            }
+        } catch (e) {
+            console.warn("Could not retrieve current user. Running as anonymous.", e);
+        }
+
+        renderQuiz();
+    }
+
+    initialize();
+
+    // --- Event Listener: Submit Button ---
+    submitBtn.addEventListener('click', async () => {
+        submitBtn.disabled = true;
+
+        let score = 0;
+        const answers = [];
+
+        // 1. คำนวณคะแนนและรวบรวมคำตอบ
+        questions.forEach((q, index) => {
+            const selected = document.querySelector(`input[name="question-${index}"]:checked`);
+            const answer = selected ? selected.value : null; 
+            answers.push(answer);
+            if (answer === q.a) score++;
+        });
+
+        const totalQuestions = questions.length;
+        
+        // 🔥 ดึงข้อมูล Email, Name และ Experience จาก URL Params หรือ sessionStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || currentUser?.email || "anonymous@example.com";
+        const userName = document.getElementById('name').value.trim() || urlParams.get('name') || sessionStorage.getItem('user_name') || "ไม่ระบุชื่อ";
+        
+        // 🔥 ดึงค่าประสบการณ์ (Experience)
+        const userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || "ไม่ระบุ";
+
+        // 2. บันทึกผลลัพธ์โดยใช้ Supabase Client (แนบ experience ไปด้วย)
+        const { error } = await supabase
+            .from('quiz_results')
+            .insert([
+                {
+                    user_email: userEmail,
+                    name: userName,
+                    score: score,
+                    total_questions: totalQuestions,
+                    answers: answers,
+                    experience: userExperience // 🔥 บันทึกค่าประสบการณ์ลง Supabase ที่นี่!
+                }
+            ]);
+
+        // 3. จัดการผลลัพธ์และการแสดงผล
+        if (error) {
+            console.error('Error saving quiz result:', error.message);
+            resultDiv.textContent = `เกิดข้อผิดพลาดในการบันทึกผล (รหัส: ${error.code}) กรุณาลองใหม่`;
+            resultDiv.style.backgroundColor = '#ffd1d1';
+            resultDiv.style.color = '#900';
+            submitBtn.disabled = false;
+        } else {
+            console.log("Quiz result saved successfully.");
+            resultDiv.textContent = `บันทึกผลสำเร็จ! คุณได้คะแนน ${score} จาก ${totalQuestions} ข้อ`;
+            resultDiv.style.backgroundColor = '#d1ffd1';
+            resultDiv.style.color = '#005900';
+        }
+
+        resultDiv.style.display = 'block';
+    });
+</script>
+</body>
+</html>

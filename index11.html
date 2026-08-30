@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>แบบทดสอบ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* โค้ด CSS สไตล์เดิม */
+        body {
+            font-family: 'Sarabun', sans-serif;
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: #f9faff;
+            color: #333;
+            padding: 20px;
+        }
+        h2 {
+            color: #004080;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .question-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .question h3 {
+            color: #0059b3;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .choices {
+            list-style: none;
+            padding: 0;
+        }
+        .choices li {
+            margin-bottom: 8px;
+        }
+        .choices label {
+            display: block;
+            background: #e6f2ff;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .choices label:hover {
+            background-color: #cce6ff;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            font-size: 1.1rem;
+            background-color: #007acc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 20px auto 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        button:hover {
+            background-color: #005fa3;
+        }
+        #result {
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            font-size: 1.2rem;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .loading-text {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            margin-top: 50px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>แบบทดสอบปรนัย: Copayment (10 ข้อ)</h2>
+
+    <div id="loading" class="loading-text">กำลังโหลดแบบทดสอบ...</div>
+
+    <div style="margin-bottom: 20px;"><label for="name">ชื่อผู้ทำแบบทดสอบ:</label><input type="text" id="name" name="name" required style="width:100%;padding:10px;margin-top:5px;"></div>
+<form id="quizForm" class="hidden"></form>
+
+    <button id="submitBtn" class="hidden">ส่งคำตอบ</button>
+
+    <div id="result"></div>
+    
+    <a href="index11.html">
+        <button style="margin-top: 20px;">ไปหน้าถัดไป</button>
+    </a>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // --- Supabase Setup ---
+        const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+
+        // ข้อมูลคำถาม (ใช้ข้อมูลเดิมทั้งหมด)
+const questions = [
+    { q: "ข้อ 1 Copayment Renewal คือข้อใด", a: "B", choices: ["การเพิ่มเบี้ยประกันทุกปี", "การที่ผู้เอาประกันต้องร่วมจ่ายค่ารักษาบางส่วนเมื่อเข้าเงื่อนไขที่กำหนดในการต่ออายุกรมธรรม์", "การงดคุ้มครองโรคร้ายแรง", "การลดทุนประกันอัตโนมัติ"] },
+    { q: "ข้อ 2 หลักเกณฑ์ Copayment Renewal มีผลกับกรมธรรม์ที่เริ่มคุ้มครองตั้งแต่วันใด", a: "C", choices: ["1 มกราคม 2568", "1 มีนาคม 2568", "21 มีนาคม 2568", "1 เมษายน 2568"] },
+    { q: "ข้อ 3 หากลูกค้าเคลมโรคเจ็บป่วยเล็กน้อย (Simple Disease) แบบ IPD ตั้งแต่กี่ครั้งขึ้นไป จึงเริ่มพิจารณา Copayment", a: "B", choices: ["1 ครั้ง", "2 ครั้ง", "3 ครั้ง", "5 ครั้ง"] },
+    { q: "ข้อ 4 กรณีโรคเจ็บป่วยเล็กน้อย (Simple Disease) ต้องมีอัตราการเคลม (Loss Ratio) เท่าใดจึงเข้าเกณฑ์ Copayment", a: "C", choices: ["100%", "150%", "200% ขึ้นไป", "500% ขึ้นไป"] },
+    { q: "ข้อ 5 กรณีโรคทั่วไป (ไม่รวมโรคร้ายแรงและผ่าตัดใหญ่) ต้องมีอัตราการเคลมเท่าใดจึงเข้าเกณฑ์ Copayment", a: "A", choices: ["200%", "300%", "350%", "400% ขึ้นไป"] },
+    { q: "ข้อ 6 หากลูกค้าเข้าเงื่อนไขกรณีที่ 1 หรือกรณีที่ 2 เพียงกรณีเดียว จะต้องร่วมจ่ายเท่าใดในปีต่ออายุถัดไป", a: "B", choices: ["10%", "20%", "30%", "50%"] },
+    { q: "ข้อ 7 หากลูกค้าเข้าเงื่อนไขทั้งกรณีที่ 1 และกรณีที่ 2 พร้อมกัน จะต้องร่วมจ่ายเท่าใด", a: "D", choices: ["20%", "30%", "40%", "50%"] },
+    { q: "ข้อ 8 ข้อใด \"ไม่ใช่\" วัตถุประสงค์ของการกำหนด Copayment", a: "D", choices: ["สร้างความยั่งยืนให้ระบบประกันสุขภาพ", "ควบคุมการเคลมที่ไม่จำเป็น", "ลดการ Admit ที่ไม่จำเป็นทางการแพทย์", "ปฏิเสธการรับประกันลูกค้าทุกคนที่เคลมบ่อย"] },
+    { q: "ข้อ 9 ลูกค้าเบี้ยสุขภาพ 20,000 บาท เคลม IPD โรคเล็กน้อย 4 ครั้ง รวมค่ารักษา 45,000 บาท คิดเป็น 225% ของเบี้ยประกัน ลูกค้าเข้าเงื่อนไขใด", a: "B", choices: ["ไม่เข้าเงื่อนไขใด", "Copayment 20%", "Copayment 30%", "Copayment 50%"] },
+    { q: "ข้อ 10 ข้อใดกล่าวถูกต้องเกี่ยวกับ Copayment Renewal", a: "C", choices: ["ลูกค้าทุกคนต้องร่วมจ่ายทันทีที่ซื้อประกัน", "ใช้กับทุกกรมธรรม์สุขภาพที่มีผลก่อน 21 มีนาคม 2568", "จะพิจารณาเฉพาะในช่วงต่ออายุกรมธรรม์ตามเงื่อนไขที่กำหนด", "เป็นการยกเลิกสิทธิการรักษาแบบผู้ป่วยใน"] }
+];
+ // --- DOM Elements ---
+    const quizForm = document.getElementById('quizForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const loading = document.getElementById('loading');
+    const resultDiv = document.getElementById('result');
+
+    // โหลดชื่อ และ ประสบการณ์ จาก Session / URL มาใส่ใน Input อัตโนมัติ (ถ้ามี)
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const storedName = urlParams.get('name') || sessionStorage.getItem('user_name');
+        if (storedName) {
+            document.getElementById('name').value = storedName;
+        }
+    });
+
+    function renderQuiz() {
+        loading.classList.add('hidden');
+        quizForm.classList.remove('hidden');
+        submitBtn.classList.remove('hidden');
+
+        questions.forEach((q, index) => {
+            const container = document.createElement('div');
+            container.className = 'question-container';
+
+            const questionTitle = document.createElement('h3');
+            questionTitle.textContent = q.q;
+            container.appendChild(questionTitle);
+
+            const ul = document.createElement('ul');
+            ul.className = 'choices';
+
+            q.choices.forEach((choice, i) => {
+                const li = document.createElement('li');
+                const label = document.createElement('label');
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = `question-${index}`;
+                input.value = String.fromCharCode(65 + i);
+                label.appendChild(input);
+                label.appendChild(document.createTextNode(`${input.value}. ${choice}`));
+                li.appendChild(label);
+                ul.appendChild(li);
+            });
+
+            container.appendChild(ul);
+            quizForm.appendChild(container);
+        });
+    }
+    
+    async function initialize() {
+        try {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (user) {
+                currentUser = user;
+            }
+        } catch (e) {
+            console.warn("Could not retrieve current user. Running as anonymous.", e);
+        }
+
+        renderQuiz();
+    }
+
+    initialize();
+
+    // --- Event Listener: Submit Button ---
+    submitBtn.addEventListener('click', async () => {
+        submitBtn.disabled = true;
+
+        let score = 0;
+        const answers = [];
+
+        // 1. คำนวณคะแนนและรวบรวมคำตอบ
+        questions.forEach((q, index) => {
+            const selected = document.querySelector(`input[name="question-${index}"]:checked`);
+            const answer = selected ? selected.value : null; 
+            answers.push(answer);
+            if (answer === q.a) score++;
+        });
+
+        const totalQuestions = questions.length;
+        
+        // 🔥 ดึงข้อมูล Email, Name และ Experience จาก URL Params หรือ sessionStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || currentUser?.email || "anonymous@example.com";
+        const userName = document.getElementById('name').value.trim() || urlParams.get('name') || sessionStorage.getItem('user_name') || "ไม่ระบุชื่อ";
+        
+        // 🔥 ดึงค่าประสบการณ์ (Experience)
+        const userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || "ไม่ระบุ";
+
+        // 2. บันทึกผลลัพธ์โดยใช้ Supabase Client (แนบ experience ไปด้วย)
+        const { error } = await supabase
+            .from('quiz_results')
+            .insert([
+                {
+                    user_email: userEmail,
+                    name: userName,
+                    score: score,
+                    total_questions: totalQuestions,
+                    answers: answers,
+                    experience: userExperience // 🔥 บันทึกค่าประสบการณ์ลง Supabase ที่นี่!
+                }
+            ]);
+
+        // 3. จัดการผลลัพธ์และการแสดงผล
+        if (error) {
+            console.error('Error saving quiz result:', error.message);
+            resultDiv.textContent = `เกิดข้อผิดพลาดในการบันทึกผล (รหัส: ${error.code}) กรุณาลองใหม่`;
+            resultDiv.style.backgroundColor = '#ffd1d1';
+            resultDiv.style.color = '#900';
+            submitBtn.disabled = false;
+        } else {
+            console.log("Quiz result saved successfully.");
+            resultDiv.textContent = `บันทึกผลสำเร็จ! คุณได้คะแนน ${score} จาก ${totalQuestions} ข้อ`;
+            resultDiv.style.backgroundColor = '#d1ffd1';
+            resultDiv.style.color = '#005900';
+        }
+
+        resultDiv.style.display = 'block';
+    });
+</script>
+</body>
+</html>

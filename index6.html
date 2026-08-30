@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>แบบทดสอบ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* โค้ด CSS สไตล์เดิม */
+        body {
+            font-family: 'Sarabun', sans-serif;
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: #f9faff;
+            color: #333;
+            padding: 20px;
+        }
+        h2 {
+            color: #004080;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .question-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .question h3 {
+            color: #0059b3;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .choices {
+            list-style: none;
+            padding: 0;
+        }
+        .choices li {
+            margin-bottom: 8px;
+        }
+        .choices label {
+            display: block;
+            background: #e6f2ff;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .choices label:hover {
+            background-color: #cce6ff;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            font-size: 1.1rem;
+            background-color: #007acc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 20px auto 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        button:hover {
+            background-color: #005fa3;
+        }
+        #result {
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            font-size: 1.2rem;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .loading-text {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            margin-top: 50px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>แบบทดสอบปรนัย: Compliance (30 ข้อ)</h2>
+
+    <div id="loading" class="loading-text">กำลังโหลดแบบทดสอบ...</div>
+
+    <div style="margin-bottom: 20px;"><label for="name">ชื่อผู้ทำแบบทดสอบ:</label><input type="text" id="name" name="name" required style="width:100%;padding:10px;margin-top:5px;"></div>
+<form id="quizForm" class="hidden"></form>
+
+    <button id="submitBtn" class="hidden">ส่งคำตอบ</button>
+
+    <div id="result"></div>
+    
+    <a href="index6.html">
+        <button style="margin-top: 20px;">ไปหน้าถัดไป</button>
+    </a>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // --- Supabase Setup ---
+        const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+
+        // ข้อมูลคำถาม (ใช้ข้อมูลเดิมทั้งหมด)
+const questions = [
+    { q: "1. ธุรกรรมทางการเงินในข้อใด ถือเป็นธุรกรรมที่มีเหตุอันควรสงสัยต่อการฟอกเงิน", a: "D", choices: ["การชำระเบี้ยประกันภัยด้วยเงินสดมูลค่าสูงผิดปกติ", "การขอเวนคืนกรรมธรรม์หลายฉบับในระยะเวลาอันสั้น", "การกู้เงินตามกรมธรรม์มูลค่าสูงหลายฉบับและขอชำระเงินคืนด้วยเงินสดเต็มจำนวนทุกฉบับ", "ถูกทุกข้อ"] },
+    { q: "2. ในระหว่างอยู่ในขั้นตอนตรวจสอบข้อเท็จจริงของลูกค้า (KYC) และการพิจารณาความเสี่ยงของลูกค้า (CDD) ข้อมูลใดต่อไปนี้ไม่ใช่ข้อมูลที่จำเป็น", a: "D", choices: ["ข้อมูลความเป็นหุ้นส่วนของบริษัทลูกค้า", "ข้อมูลแหล่งที่มารายได้ของลูกค้า", "วัตถุประสงค์ในการทำธุรกรรมของลูกค้า", "ประวัติการศึกษาของลูกค้า"] },
+    { q: "3. กลุ่มนักค้ายาเสพติดโอนเงินผ่านบัญชีต่างๆ โดยสร้างขั้นตอนเพื่อความซับซ้อนเพื่อปิดบังแหล่งที่มาของเงิน กรณีดังกล่าวถือเป็นขั้นตอนใดในการฟอกเงิน", a: "B", choices: ["การนำเงินสดเข้าระบบ (Placement)", "การนำเงินไปผ่านธุรกรรมหลายๆ ชั้น (Layering)", "การนำเงินกลับเข้าสู่ระบบการเงิน (Integration)", "ถูกทุกข้อ"] },
+    { q: "4. หากคุณสงสัยว่าลูกค้าของคุณอาจจะเกี่ยวข้องกับการกระทำความผิดด้านการฟอกเงิน คุณควรจะต้องปฏิบัติอย่างไร", a: "C", choices: ["ปรึกษาเรื่องนี้กับเพื่อนร่วมงานของคุณเพื่อขอคำแนะนำ", "เก็บเรื่องนี้เอาไว้คนเดียว", "แจ้งเหตุสงสัยให้แก่บริษัททราบโดยเร็ว", "ติดต่อลูกค้าของคุณเพื่ออธิบายเหตุต้องสงสัย"] },
+    { q: "5. เมื่อคุณประเมินระดับความเสี่ยงการฟอกเงินของลูกค้า ข้อมูลใดบ้างที่ต้องนำมาพิจารณา", a: "D", choices: ["ประวัติของลูกค้า", "ความซับซ้อนของผลิตภัณฑ์ที่เกี่ยวข้อง", "สถานที่ (ประเทศ) ของแหล่งที่มาของรายได้", "ถูกทุกข้อ"] },
+    { q: "6. เมื่อลูกค้าต้องการซื้อกรมธรรม์ประกันภัยใหม่แต่ปฏิเสธที่จะให้ข้อมูลแสดงตนที่สำคัญเพื่อประโยชน์ในการระบุตัวตนของลูกค้า (KYC) และการพิจารณาความเสี่ยงของลูกค้า (CDD) ท่านจะต้องทำอย่างไร", a: "B", choices: ["ไม่ต้องทำอะไร เนื่องจากพนักงานต้องเคารพข้อมูลส่วนบุคคลของลูกค้า", "อธิบายลูกค้าว่าไม่สามารถซื้อกรมธรรม์ประกันภัยได้หากไม่มีข้อมูลแสดงตนที่สำคัญ", "รายงานเรื่องดังกล่าวต่อเจ้าหน้าที่ตำรวจ", "ปรึกษาผู้บังคับบัญชาของท่านในการขอข้อยกเว้น (Exemption) ในการปฏิบัติตามขั้นตอน KYC/CDD"] },
+    { q: "7. บุคคลใดต่อไปนี้ ปฏิบัติไม่ถูกต้องเกี่ยวกับการป้องกันการสนับสนุนทางการเงินแก่การก่อการร้ายและการแพร่ขยายอาวุธที่มีอานุภาพทำลายล้างสูง", a: "C", choices: ["นายแดง แจ้งฝ่ายกำกับดูแลทันทีเมื่อพบว่าลูกค้าเป็นบุคคลที่ถูกกำหนด", "นางสาวบี แจ้งฝ่ายกำกับดูแลทันทีเมื่อพบว่าลูกค้ามีที่อยู่ในประเทศที่รัฐบาลประกาศห้ามทำการค้า (sanctions country)", "นายเดือนแจ้งฝ่ายกำกับดูแลโดยทันทีเมื่อพบว่าลูกค้าเป็นบุคคลล้มละลาย", "นางสาวแพรว แจ้งฝ่ายกำกับดูแลโดยทันทีเมื่อพบว่าลูกค้าเป็นผู้กระทำการแทนบุคคลที่ถูกกำหนด"] },
+    { q: "8. ข้อใดต่อไปนี้ถือเป็นคำอธิบายของการสนับสนุนทางการเงินแก่การก่อการร้ายได้ดีที่สุด", a: "A", choices: ["การจ่ายเงินเพื่อวัตถุประสงค์ให้มีการก่อการร้าย", "การที่ผู้ก่อการร้ายใช้เงินในกองทุนเพื่อหลีกเลี่ยงภาษี", "การฟอกเงินโดยอาศัยกิจกรรมภายใต้การก่อการร้าย", "การหาเงินจากการก่อการร้าย"] },
+    { q: "9. “หลังจากที่มีการดำเนินการตามขั้นตอนรู้จักตัวตนลูกค้า และ การตรวจสอบเพื่อทราบข้อเท็จจริงเกี่ยวกับลูกค้า (KYC/CDD) ในเบื้องต้นแล้ว เราไม่จำเป็นต้องตรวจสอบเพื่อทราบข้อเท็จจริงลูกค้าเพิ่มเติมอีก ถึงแม้ว่าลูกค้ารายนั้นจะมีความเสี่ยงสูงด้านการฟอกเงิน” ข้อความนี้ถูกหรือผิด?", a: "B", choices: ["ถูก", "ผิด"] },
+    { q: "10. คุณมีหน้าที่ใดในการปฎิบัติตามนโยบายเกี่ยวกับการต่อต้านและป้องกันการฟอกเงิน", a: "D", choices: ["จัดทำรายงานธุรกรรมที่มีเหตุอันควรสงสัยของลูกค้าให้แก่สำนักงาน ปปง. ด้วยตนเอง", "เฝ้าระวังพฤติการณ์ที่อาจมีความเสี่ยงและรายงานหตุการณ์นั้นๆ หรือเหตุต้องสงสัยเกี่ยวกับการฟอกเงินต่อบริษัท", "แจ้งให้ลูกค้าทราบถึงการทำธุรกรรมที่มีความเสี่ยงสูงที่ลูกค้าได้ทำขึ้น", "ไม่ต้องทำอะไร เนื่องจากอยู่นอกเหนือขอบข่ายงาน"] },
+    { q: "11. การติดสินบนคืออะไร?", a: "A", choices: ["การเสนอ สัญญาว่าจะให้ ให้ รับ เงินหรือผลประโยชน์อื่นใดเพื่อจูงใจในอันที่จะมีผลต่อการตัดสินใจเพื่อให้ได้ซึ่งผลประโยชน์ในเชิงพาณิชย์ ในทางสัญญา หรือในทางกฎหมาย", "การใช้อำนาจหน้าที่ในทางมิชอบเพื่อแสวงหาผลประโยชน์ส่วนบุคคล", "การมอบปฏิทินปีใหม่ของบริษัทให้แก่ลูกค้า", "ถูกทุกข้อ"] },
+    { q: "12. เหตุใดต่อไปนี้ไม่สามารถใช้เป็นข้อแก้ต่างในการละเมิดกฎหมายการต่อต้านการติดสินบนและการคอรัปชั่นได้?", a: "D", choices: ["เราไม่รู้ว่าการกระทำเช่นนี้จะเป็นการติดสินบน", "เราปฏิบัติเช่นนี้มาโดยตลอด", "เราเพียงแค่ได้รับคูปองเข้าพักในโรงแรมฟรีไม่กี่คืน คงไม่นับว่าเป็นการติดสินบนจริงไหม", "ถูกทุกข้อ"] },
+    { q: "13. โปรดเลือกทุกข้อที่แสดงถึงพฤติกรรมของบุคคลที่มีแนวโน้มกระทำการทุจริต", a: "B", choices: ["มีการวางแผนค่าใช้จ่ายอย่างเหมาะสม", "มีปัญหาด้านการเงิน", "เป็นตัวแทนประกันชีวิตรายใหม่ของบริษัท", "เป็นพนักงานฝ่ายบริการลูกค้า"] },
+    { q: "14. ส่วนงานใดที่อาจมีความเสี่ยงที่จะเป็นเป้าหมายของผู้ให้หรือรับสินบน", a: "C", choices: ["ฝ่ายจัดซื้ออุปกรณ์สำนักงาน", "ฝ่ายขาย", "ถูกทุกข้อ"] },
+    { q: "15. ของขวัญประเภทใดอาจจะมีโอกาสเป็นการติดสินบนได้", a: "C", choices: ["ปฏิทินปีใหม่", "เสื้อยืดที่ระลึกของบริษัท", "โทรทัศน์"] },
+    { q: "16. นายเอเป็นตัวแทนประกันชีวิตของบริษัท นำเงินค่าเบี้ยประกันภัยของลูกค้าเพื่อไปจ่ายค่ารักษาพยาบาลแม่ของตนที่กำลังป่วยหนัก ถึงแม้ว่าต่อมานายเอได้นำส่งเงินค่าเบี้ยประกันให้แก่บริษัทครบถ้วนตามระยะเวลาผ่อนผัน ดังนั้นการกระทำของนายเอถูกต้องหรือไม่", a: "B", choices: ["ถูกต้อง เนื่องจากเป็นการแสดงออกถึงความกตัญญูต่อมารดา", "ไม่ถูกต้อง เนื่องจากพฤติกรรมดังกล่าวถือว่ามีเจตนาส่อทุจริต และนายเอไม่มีสิทธินำเงินของลูกค้าไปใช้เพื่อประโยชน์ส่วนตัว"] },
+    { q: "17. คุณต้องได้รับประโยชน์จากการฉ้อโกงจึงถือเป็นการกระทำความผิดตามกฎหมายใช่หรือไม่", a: "B", choices: ["ใช่", "ไม่ใช่"] },
+    { q: "18. บุคคลที่กระทำทุจริตอาจได้รับโทษตามข้อใดดังต่อไปนี้", a: "D", choices: ["โทษจำคุก", "การบอกเลิกสัญญาจากบริษัท", "โทษทางวินัยของบริษัท", "ถูกทุกข้อ"] },
+    { q: "19. นางใจเป็นตัวแทนประกันชีวิต ได้ออกใบรับเงินค่าเบี้ยประกันชีวิตให้แก่ลูกค้าเป็นบิลเงินสด เนื่องจากลืมนำใบเสร็จรับเงินชั่วคราวของบริษัทมา การกระทำของนางใจถูกต้องหรือไม่", a: "B", choices: ["ถูกต้อง เนื่องจากนางใจตั้งใจว่าจะนำส่งใบเสร็จรับเงินชั่วคราวของบริษัทให้แก่ลูกค้าในภายหลัง", "ไม่ถูกต้อง เนื่องจากการรับชำระเบี้ยจากลูกค้า ตัวแทนประกันชีวิตจะต้องออกใบเสร็จรับเงินของบริษัททุกครั้งที่มีการรับเบี้ยประกันในนามของบริษัท"] },
+    { q: "20. ข้อใดต่อไปนี้อาจบ่งชี้ว่าอาจมีการกระทำทุจริต", a: "C", choices: ["ความไม่สมดุลระหว่างรายได้กับไลฟ์สไตล์ของบุคคลนั้น", "การรับของขวัญที่มีมูลค่าสูงจากลูกค้า", "ถูกทุกข้อ"] },
+    { q: "21. ตัวแทนหรือนายหน้าแนะนำให้ผู้เอาประกันชีวิตยกเลิกกรมธรรม์ฉบับเก่าก่อนครบกำหนด เพื่อซื้อกรมธรรม์ฉบับใหม่ที่ให้ค่าบำเหน็จแก่ตัวแทนสูงขึ้น", a: "B", choices: ["ถูก", "ผิด"] },
+    { q: "22. ตัวแทนหรือนายหน้าเสนอส่วนลดค่าเบี้ยประกันชีวิตให้แก่ผู้เอาประกันชีวิต", a: "B", choices: ["ถูก", "ผิด"] },
+    { q: "23. ตัวแทนหรือนายหน้าจ่ายค่าเบี้ยประกันชีวิตให้แก่ผู้เอาประกันชีวิตไปก่อน แล้วให้ผู้เอาประกันชีวิตผ่อนจ่ายคืนค่าเบี้ยประกันชีวิตให้ภายหลัง โดยที่ผู้เอาประกันชีวิตรับทราบละยินยอมแล้ว", a: "B", choices: ["ถูก", "ผิด"] },
+    { q: "24. ตัวแทนหรือนายหน้าให้ผู้มุ่งหวังหรือผู้ทรงกรมธรรม์ลงลายมือชื่อในแบบฟอร์มเปล่า แล้วตัวแทนค่อยกรอกรายละเอียดการขอเอาประกันชีวิตให้ภายหลัง โดยที่ได้รับความยินยอมจากผู้มุ่งหวังหรือผู้ทรงกรมธรรม์แล้ว", a: "B", choices: ["ถูก", "ผิด"] },
+    { q: "25. ตัวแทนหรือนายหน้าแนะนำให้ผู้เอาประกันชีวิตซื้อสัญญาเพิ่มเติมแนบท้ายกรมธรรม์ฉบับเดิม", a: "A", choices: ["ถูก", "ผิด"] },
+    { q: "26. ตัวแทนหรือนายหน้าแนะนำให้ผู้เอาประกันชีวิตซื้อกรมธรรม์ประกันชีวิตฉบับใหม่ ที่ให้ค่าบำเหน็จแก่ตัวแทนสูง และแจ้งผู้เอาประกันชีวิตว่าให้ยกเลิกกรมธรรม์ฉบับเก่าภายหลังจากได้รับกรมธรรม์ฉบับใหม่แล้ว", a: "B", choices: ["ถูก", "ผิด"] },
+    { q: "27. ตัวแทนหรือนายหน้าลงทุนทำสื่อส่งเสริมการขาย โฆษณา หรือโบรชัวร์ ซึ่งมีเนื้อหาเกี่ยวกับบริษัทฯ ด้วยตัวเอง โดยไม่ได้รับอนุญาตจากบริษัทฯ", a: "B", choices: ["ถูก", "ผิด"] },
+    { q: "28. ตัวแทนหรือนายหน้าเดินทางไปขายประกันชีวิตให้แก่ผู้มุ่งหวังที่ถือสัญชาติลาวและมีถิ่นพำนักอยู่ในประเทศลาว", a: "B", choices: ["ถูก", "ผิด"] },
+    { q: "29. นายหน้าประกันชีวิตไม่ได้ยื่นใบอนุญาตตัวแทนให้ลูกค้าตรวจสอบ แต่ติดตั้งใบอนุญาตตัวแทนไว้บนเคาน์เตอร์ที่ขายประกันชีวิตให้แก่ลูกค้าเห็น", a: "A", choices: ["ถูก", "ผิด"] },
+    { q: "30. ตัวอย่างของเรื่องที่ท่านสามารถรายงานผ่าน บริการเว็บไซต์และสายด่วน ‘Speak Out’ ข้อใดถูกต้อง", a: "D", choices: ["การติดสินบนหรือการทุจริต", "การใช้ข้อมูลภายในในทางที่มิชอบ", "การบัญชีหรือการตรวจสอบที่น่าสงสัย", "ถูกทุกข้อ"] }
+];
+ // --- DOM Elements ---
+    const quizForm = document.getElementById('quizForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const loading = document.getElementById('loading');
+    const resultDiv = document.getElementById('result');
+
+    // โหลดชื่อ และ ประสบการณ์ จาก Session / URL มาใส่ใน Input อัตโนมัติ (ถ้ามี)
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const storedName = urlParams.get('name') || sessionStorage.getItem('user_name');
+        if (storedName) {
+            document.getElementById('name').value = storedName;
+        }
+    });
+
+    function renderQuiz() {
+        loading.classList.add('hidden');
+        quizForm.classList.remove('hidden');
+        submitBtn.classList.remove('hidden');
+
+        questions.forEach((q, index) => {
+            const container = document.createElement('div');
+            container.className = 'question-container';
+
+            const questionTitle = document.createElement('h3');
+            questionTitle.textContent = q.q;
+            container.appendChild(questionTitle);
+
+            const ul = document.createElement('ul');
+            ul.className = 'choices';
+
+            q.choices.forEach((choice, i) => {
+                const li = document.createElement('li');
+                const label = document.createElement('label');
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = `question-${index}`;
+                input.value = String.fromCharCode(65 + i);
+                label.appendChild(input);
+                label.appendChild(document.createTextNode(`${input.value}. ${choice}`));
+                li.appendChild(label);
+                ul.appendChild(li);
+            });
+
+            container.appendChild(ul);
+            quizForm.appendChild(container);
+        });
+    }
+    
+    async function initialize() {
+        try {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (user) {
+                currentUser = user;
+            }
+        } catch (e) {
+            console.warn("Could not retrieve current user. Running as anonymous.", e);
+        }
+
+        renderQuiz();
+    }
+
+    initialize();
+
+    // --- Event Listener: Submit Button ---
+    submitBtn.addEventListener('click', async () => {
+        submitBtn.disabled = true;
+
+        let score = 0;
+        const answers = [];
+
+        // 1. คำนวณคะแนนและรวบรวมคำตอบ
+        questions.forEach((q, index) => {
+            const selected = document.querySelector(`input[name="question-${index}"]:checked`);
+            const answer = selected ? selected.value : null; 
+            answers.push(answer);
+            if (answer === q.a) score++;
+        });
+
+        const totalQuestions = questions.length;
+        
+        // 🔥 ดึงข้อมูล Email, Name และ Experience จาก URL Params หรือ sessionStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || currentUser?.email || "anonymous@example.com";
+        const userName = document.getElementById('name').value.trim() || urlParams.get('name') || sessionStorage.getItem('user_name') || "ไม่ระบุชื่อ";
+        
+        // 🔥 ดึงค่าประสบการณ์ (Experience)
+        const userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || "ไม่ระบุ";
+
+        // 2. บันทึกผลลัพธ์โดยใช้ Supabase Client (แนบ experience ไปด้วย)
+        const { error } = await supabase
+            .from('quiz_results')
+            .insert([
+                {
+                    user_email: userEmail,
+                    name: userName,
+                    score: score,
+                    total_questions: totalQuestions,
+                    answers: answers,
+                    experience: userExperience // 🔥 บันทึกค่าประสบการณ์ลง Supabase ที่นี่!
+                }
+            ]);
+
+        // 3. จัดการผลลัพธ์และการแสดงผล
+        if (error) {
+            console.error('Error saving quiz result:', error.message);
+            resultDiv.textContent = `เกิดข้อผิดพลาดในการบันทึกผล (รหัส: ${error.code}) กรุณาลองใหม่`;
+            resultDiv.style.backgroundColor = '#ffd1d1';
+            resultDiv.style.color = '#900';
+            submitBtn.disabled = false;
+        } else {
+            console.log("Quiz result saved successfully.");
+            resultDiv.textContent = `บันทึกผลสำเร็จ! คุณได้คะแนน ${score} จาก ${totalQuestions} ข้อ`;
+            resultDiv.style.backgroundColor = '#d1ffd1';
+            resultDiv.style.color = '#005900';
+        }
+
+        resultDiv.style.display = 'block';
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>แบบทดสอบ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* โค้ด CSS สไตล์เดิม */
+        body {
+            font-family: 'Sarabun', sans-serif;
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: #f9faff;
+            color: #333;
+            padding: 20px;
+        }
+        h2 {
+            color: #004080;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .question-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .question h3 {
+            color: #0059b3;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .choices {
+            list-style: none;
+            padding: 0;
+        }
+        .choices li {
+            margin-bottom: 8px;
+        }
+        .choices label {
+            display: block;
+            background: #e6f2ff;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .choices label:hover {
+            background-color: #cce6ff;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            font-size: 1.1rem;
+            background-color: #007acc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 20px auto 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        button:hover {
+            background-color: #005fa3;
+        }
+        #result {
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            font-size: 1.2rem;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .loading-text {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            margin-top: 50px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>แบบทดสอบปรนัย: SalesForce (10 ข้อ)</h2>
+
+    <div id="loading" class="loading-text">กำลังโหลดแบบทดสอบ...</div>
+
+    <div style="margin-bottom: 20px;"><label for="name">ชื่อผู้ทำแบบทดสอบ:</label><input type="text" id="name" name="name" required style="width:100%;padding:10px;margin-top:5px;"></div>
+<form id="quizForm" class="hidden"></form>
+
+    <button id="submitBtn" class="hidden">ส่งคำตอบ</button>
+
+    <div id="result"></div>
+    
+    <a href="index10.html">
+        <button style="margin-top: 20px;">ไปหน้าถัดไป</button>
+    </a>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // --- Supabase Setup ---
+        const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+
+        // ข้อมูลคำถาม (ใช้ข้อมูลเดิมทั้งหมด)
+const questions = [
+    { q: "1.Lead สถานะ Call Back หลังจากติดต่ออีกครั้งลูกค้าไม่รับสายต้องลงสถานะใด", a: "A", choices: ["Call Back", "No Contact", "In Progress", "Closed"] },
+    { q: "2.การเข้าหน้า Lead New", a: "A", choices: ["กดที่ ปุ่ม หน้าแรก แล้วคลิก ที่ Leads", "กดที่ปุ่ม หน้าแรก แล้วคลิก รายงาน", "กดปุ่ม ติดต่อลูกค้า", "ไม่มีข้อใดถูก"] },
+    { q: "3.เราจะเห็น New Leads จาก การคลิกที่ปุ่มใด", a: "B", choices: ["คลิกที่ปุ่ม ล่าสุด เลือก InProgress Call Back", "คลิกที่ปุ่ม ล่าสุด เลือก Assign Leads to me", "คลิกที่ปุ่ม ค้นหา", "คลิกที่ปุ่ม รายงาน"] },
+    { q: "4.การจะโทรออกหาลูกค้าต้องทำอย่างไร", a: "A", choices: ["คลิก ที่ชื่อลูกค้า แล้วจะเห็นเบอร์โทรสามารถคลิกที่เบอร์ได้เลย", "คลิก ที่นามสกุลลูกค้า แล้วจะเห็นเบอร์โทรสามารถคลิกที่เบอร์ได้เลย", "พิมพ์เบอร์โทรศัพท์ใหม่", "โอนสายไปให้หัวหน้างาน"] },
+    { q: "5.ในการแก้ไขข้อมูลต่างในโปรแกรม Salesforce ต้องคลิกที่ปุ่มใดจำเป็นต้องตอบ.", a: "A", choices: ["สามารถคลิกที่ รูป ดินสอเพื่อแก้ไขข้อมูลได้", "ไม่สามารถแก้ไขข้อมูลได้", "คลิกที่รูป ยางลบ", "คลิกที่รูป เซฟ"] },
+    { q: "6.ตามขั้นตอนของการลง Status ของ Leads  คำว่า InProgress Call back คือ สถานะใดจำเป็นต้อง", a: "A", choices: ["ติดต่ออีกครั้ง นำเสนอแล้วแต่ขอติดสินใจ", "ติดต่ออีกครั้ง เจอตัวแต่ยังไม่ได้นำเสนอ", "ลูกค้าตอบตกลง", "ลูกค้าปฏิเสธ"] },
+    { q: "7.ตามขั้นตอนของการลง Status ของ Leads  คำว่า InProgress No contact  คือ สถานะใดจำเป็นต้อง มีคนรับแต่ไม่ใช่เจ้าตัว", a: "A", choices: ["ไม่มีผู้รับสาย", "มีคนรับแต่ไม่ใช่เจ้าตัว", "สายไม่ว่าง", "ฝากข้อความ"] },
+    { q: "8.ตามขั้นตอนของการลง Status ของ Leads  คำว่า InProgress Present Product Follow Up  คือ สถานะใดจำเป็นต้องตอบ.", a: "A", choices: ["ติดต่ออีกครั้งเพื่อติดตามผล หรือปิดการขาย", "ติดต่อเพื่อนำเสนอขาย", "ปิดการขายสำเร็จ", "ลูกค้ายกเลิกกรมธรรม์"] },
+    { q: "9.ตามขั้นตอนของการลง Status ของ Leads  คำว่า Health Evaluation คือ สถานะใดจำเป็นต้องตอบ.", a: "A", choices: ["เปิดคำถามสุขภาพ 5 ข้อเพื่อลงสถานะเรื่องสุขภาพลูกค้า", "การลงทะเบียนการขาย", "ประเมินเบี้ยประกัน", "ยกเลิกกรรมธรรม์"] },
+    { q: "10.หากลูกค้า ติดปัญหาสุขภาพ ต้องอ่าน Regal บทใดจำเป็นต้องตอบ.", a: "B", choices: ["Healthy", "Un Healthy", "Standard", "Declined"] }
+];
+ // --- DOM Elements ---
+    const quizForm = document.getElementById('quizForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const loading = document.getElementById('loading');
+    const resultDiv = document.getElementById('result');
+
+    // โหลดชื่อ และ ประสบการณ์ จาก Session / URL มาใส่ใน Input อัตโนมัติ (ถ้ามี)
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const storedName = urlParams.get('name') || sessionStorage.getItem('user_name');
+        if (storedName) {
+            document.getElementById('name').value = storedName;
+        }
+    });
+
+    function renderQuiz() {
+        loading.classList.add('hidden');
+        quizForm.classList.remove('hidden');
+        submitBtn.classList.remove('hidden');
+
+        questions.forEach((q, index) => {
+            const container = document.createElement('div');
+            container.className = 'question-container';
+
+            const questionTitle = document.createElement('h3');
+            questionTitle.textContent = q.q;
+            container.appendChild(questionTitle);
+
+            const ul = document.createElement('ul');
+            ul.className = 'choices';
+
+            q.choices.forEach((choice, i) => {
+                const li = document.createElement('li');
+                const label = document.createElement('label');
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = `question-${index}`;
+                input.value = String.fromCharCode(65 + i);
+                label.appendChild(input);
+                label.appendChild(document.createTextNode(`${input.value}. ${choice}`));
+                li.appendChild(label);
+                ul.appendChild(li);
+            });
+
+            container.appendChild(ul);
+            quizForm.appendChild(container);
+        });
+    }
+    
+    async function initialize() {
+        try {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (user) {
+                currentUser = user;
+            }
+        } catch (e) {
+            console.warn("Could not retrieve current user. Running as anonymous.", e);
+        }
+
+        renderQuiz();
+    }
+
+    initialize();
+
+    // --- Event Listener: Submit Button ---
+    submitBtn.addEventListener('click', async () => {
+        submitBtn.disabled = true;
+
+        let score = 0;
+        const answers = [];
+
+        // 1. คำนวณคะแนนและรวบรวมคำตอบ
+        questions.forEach((q, index) => {
+            const selected = document.querySelector(`input[name="question-${index}"]:checked`);
+            const answer = selected ? selected.value : null; 
+            answers.push(answer);
+            if (answer === q.a) score++;
+        });
+
+        const totalQuestions = questions.length;
+        
+        // 🔥 ดึงข้อมูล Email, Name และ Experience จาก URL Params หรือ sessionStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || currentUser?.email || "anonymous@example.com";
+        const userName = document.getElementById('name').value.trim() || urlParams.get('name') || sessionStorage.getItem('user_name') || "ไม่ระบุชื่อ";
+        
+        // 🔥 ดึงค่าประสบการณ์ (Experience)
+        const userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || "ไม่ระบุ";
+
+        // 2. บันทึกผลลัพธ์โดยใช้ Supabase Client (แนบ experience ไปด้วย)
+        const { error } = await supabase
+            .from('quiz_results')
+            .insert([
+                {
+                    user_email: userEmail,
+                    name: userName,
+                    score: score,
+                    total_questions: totalQuestions,
+                    answers: answers,
+                    experience: userExperience // 🔥 บันทึกค่าประสบการณ์ลง Supabase ที่นี่!
+                }
+            ]);
+
+        // 3. จัดการผลลัพธ์และการแสดงผล
+        if (error) {
+            console.error('Error saving quiz result:', error.message);
+            resultDiv.textContent = `เกิดข้อผิดพลาดในการบันทึกผล (รหัส: ${error.code}) กรุณาลองใหม่`;
+            resultDiv.style.backgroundColor = '#ffd1d1';
+            resultDiv.style.color = '#900';
+            submitBtn.disabled = false;
+        } else {
+            console.log("Quiz result saved successfully.");
+            resultDiv.textContent = `บันทึกผลสำเร็จ! คุณได้คะแนน ${score} จาก ${totalQuestions} ข้อ`;
+            resultDiv.style.backgroundColor = '#d1ffd1';
+            resultDiv.style.color = '#005900';
+        }
+
+        resultDiv.style.display = 'block';
+    });
+</script>
+</body>
+</html>
