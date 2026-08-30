@@ -131,21 +131,49 @@
             font-weight: bold;
         }
         
-        @media print {
-            body { background: #fff; }
-            body * { visibility: hidden; }
-            #certificate, #certificate * { visibility: visible; }
-            #certificate {
-                position: absolute;
-                left: 50%;
-                top: 40%;
-                transform: translate(-50%, -50%);
-                width: 100%;
-                box-shadow: none;
-            }
+@media print {
+            /* 1. ตั้งค่าหน้ากระดาษเป็น A4 แนวนอน และลบ Margin เพื่อซ่อน Header/Footer (วันที่, URL) */
             @page {
-                size: landscape;
-                margin: 0mm;
+                size: A4 landscape;
+                margin: 0mm !important; 
+            }
+            
+            /* 2. ซ่อนเนื้อหาทั้งหมดในหน้าเว็บ (ยกเว้นใบประกาศ) */
+            body > *:not(#certificate-wrapper) {
+                display: none !important;
+            }
+
+            /* 3. ล็อกกล่องคลุมใบประกาศให้เต็ม 1 หน้ากระดาษพอดี ป้องกันการขึ้นหน้าใหม่ */
+            #certificate-wrapper {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: white !important;
+            }
+
+            /* 4. จัดทรงใบประกาศให้อยู่กึ่งกลาง และจำกัดขนาดไม่ให้ล้นหน้า A4 */
+            #certificate {
+                display: block !important;
+                width: 90% !important;
+                max-width: 260mm !important; 
+                margin: auto !important;
+                position: static !important;
+                transform: none !important;
+                box-shadow: none !important;
+                page-break-inside: avoid !important;
+            }
+
+            /* 5. ซ่อนปุ่มดาวน์โหลดและลิงก์ต่างๆ ตอนสั่งพิมพ์ */
+            #certificate-wrapper button, 
+            #certificate-wrapper a {
+                display: none !important;
             }
         }
     </style>
