@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>แบบทดสอบ</title>
+    <title>แบบทดสอบ: Underwriting</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* โค้ด CSS สไตล์เดิม */
         body {
             font-family: 'Sarabun', sans-serif;
             max-width: 900px;
@@ -31,6 +30,7 @@
             color: #0059b3;
             margin-bottom: 10px;
             font-size: 1.1rem;
+            line-height: 1.5;
         }
         .choices {
             list-style: none;
@@ -90,24 +90,135 @@
         .hidden {
             display: none;
         }
+        
+        /* สไตล์สำหรับใบประกาศนียบัตรจำลอง */
+        #certificate-wrapper {
+            display: none;
+            text-align: center;
+            margin-top: 40px;
+        }
+        #certificate {
+            background: #fff;
+            border: 15px solid #004080;
+            padding: 15px;
+            text-align: center;
+            border-radius: 4px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .cert-inner {
+            border: 2px solid #d4af37;
+            padding: 50px 30px;
+            background-color: #faf9f5;
+        }
+        .cert-title {
+            color: #d4af37; 
+            font-family: 'Georgia', serif; 
+            font-size: 2.5rem; 
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .cert-name {
+            color: #004080; 
+            font-size: 2rem;
+            border-bottom: 2px solid #004080; 
+            display: inline-block; 
+            padding: 0 40px 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 0mm !important; 
+            }
+            
+            body > *:not(#certificate-wrapper) {
+                display: none !important;
+            }
+
+            #certificate-wrapper {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: white !important;
+            }
+
+            #certificate {
+                display: block !important;
+                width: 90% !important;
+                max-width: 260mm !important; 
+                margin: auto !important;
+                position: static !important;
+                transform: none !important;
+                box-shadow: none !important;
+                page-break-inside: avoid !important;
+            }
+
+            #certificate-wrapper button, 
+            #certificate-wrapper a {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <h2>แบบทดสอบปรนัย: Underwriting (15 ข้อ)</h2>
+    <h2 id="quizHeader">แบบทดสอบปรนัย: Underwriting (15 ข้อ)</h2>
 
     <div id="loading" class="loading-text">กำลังโหลดแบบทดสอบ...</div>
 
-    <div style="margin-bottom: 20px;"><label for="name">ชื่อผู้ทำแบบทดสอบ:</label><input type="text" id="name" name="name" required style="width:100%;padding:10px;margin-top:5px;"></div>
-<form id="quizForm" class="hidden"></form>
+    <div style="margin-bottom: 20px;">
+        <label for="name">ชื่อผู้ทำแบบทดสอบ:</label>
+        <input type="text" id="name" name="name" required style="width:100%;padding:10px;margin-top:5px;" placeholder="กรุณากรอกชื่อ-นามสกุล">
+    </div>
+    
+    <form id="quizForm" class="hidden"></form>
 
     <button id="submitBtn" class="hidden">ส่งคำตอบ</button>
 
     <div id="result"></div>
-    
-    <a href="index7.html">
-        <button style="margin-top: 20px;">ไปหน้าถัดไป</button>
-    </a>
+    <div id="actionContainer" style="text-align: center; margin-top: 20px;"></div>
+
+    <!-- ส่วนแสดงใบประกาศนียบัตร -->
+    <div id="certificate-wrapper">
+        <div id="certificate">
+            <div class="cert-inner">
+                <h1 class="cert-title">Certificate of Achievement</h1>
+                <p style="font-size: 1.2rem; color: #555; margin-top: 20px;">ขอมอบประกาศนียบัตรฉบับนี้เพื่อให้เกียรติว่า</p>
+                <h2 id="certName" class="cert-name">-</h2>
+                <p style="font-size: 1.2rem; color: #555; margin-top: 10px;">
+                    ได้ผ่านการทดสอบหลักสูตร <br> 
+                    <strong id="certCourseName" style="color: #333; font-size: 1.5rem;">-</strong> <br> 
+                    ด้วยคะแนนที่ผ่านเกณฑ์มาตรฐานอย่างสมบูรณ์
+                </p>
+                <div style="margin-top: 50px; text-align: center;">
+                    <div style="display: inline-block; width: 200px; border-top: 1px solid #333; padding-top: 10px; margin: 0 20px;">
+                        <p style="margin: 0; font-size: 0.9rem;">Prudential Life Assurance</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button id="downloadCertBtn" style="background-color: #28a745; max-width: 250px; margin: 30px auto;">
+            📥 ดาวน์โหลดใบประกาศ
+        </button>
+        <!-- ลิงก์สำหรับไปชุดที่ 8 -->
+        <a href="index8.html" id="nextPageLink" style="text-decoration: none;">
+            <button style="margin-top: 10px; background-color: #007acc; max-width: 250px; margin: 10px auto;">ไปหน้าถัดไป (ชุดที่ 8)</button>
+        </a>
+    </div>
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -119,144 +230,177 @@
 
         let currentUser = null;
 
-        // ข้อมูลคำถาม (ใช้ข้อมูลเดิมทั้งหมด)
-const questions = [
-    { q: "ข้อ 1.การพิจารณารับประกันภัย (Underwriting) หมายถึงข้อใด", a: "B", choices: ["การอนุมัติสินเชื่อให้ลูกค้า", "กระบวนการคัดเลือกความเสี่ยงที่บริษัทสามารถรับประกันได้", "การจ่ายค่าสินไหมให้ลูกค้า", "การคำนวณเบี้ยประกันภัย"] },
-    { q: "ข้อ 2.ข้อใดไม่ใช่ปัจจัยหลักในการพิจารณารับประกันภัย", a: "D", choices: ["อายุ", "อาชีพ", "ประวัติสุขภาพ", "ยี่ห้อรถยนต์ที่ใช้"] },
-    { q: "ข้อ 3.ช่องทาง Telesales โดยทั่วไปสามารถรับประกันภัยได้ถึงอายุเท่าใด", a: "C", choices: ["45 ปี", "50 ปี", "55 ปี", "60 ปี"] },
-    { q: "ข้อ 4.อาชีพใดต่อไปนี้เป็นตัวอย่างอาชีพที่ไม่สามารถรับสมัครประกันชีวิตได้", a: "C", choices: ["พนักงานบัญชี", "พนักงานธุรการ", "นักแสดงผาดโผน", "ครู"] },
-    { q: "ข้อ 5.ขั้นอาชีพใดมีความเสี่ยงมาตรฐานและไม่เพิ่มเบี้ยประกันภัย", a: "A", choices: ["ขั้นอาชีพ 1", "ขั้นอาชีพ 2", "ขั้นอาชีพ 3", "ขั้นอาชีพ 4"] },
-    { q: "ข้อ 6.ลูกค้ากลุ่มใดถือเป็น Vulnerable Customer", a: "C", choices: ["อายุ 35 ปี มีประกันชีวิตหลายฉบับ", "อายุ 45 ปี มีความรู้ทางการเงินดี", "อายุ 60 ปีขึ้นไป", "อายุ 30 ปี รายได้สูง"] },
-    { q: "ข้อ 7.เมื่อพบลูกค้ากลุ่มเปราะบางและลูกค้าต้องการให้มีบุคคลที่ไว้วางใจร่วมฟังการเสนอขาย ผู้เสนอขายควรทำอย่างไร", a: "D", choices: ["ดำเนินการขายต่อได้ทันที", "ขออนุญาตหัวหน้างานก่อน", "ส่งเอกสารให้ลูกค้าอ่านเอง", "รอจนบุคคลดังกล่าวเข้าร่วมฟังแล้วจึงเริ่มเสนอขาย"] },
-    { q: "ข้อ 8.ข้อใดเป็นตัวอย่างโรคที่ไม่สามารถรับประกันภัยได้", a: "C", choices: ["ไข้หวัด", "กระเพาะอาหารอักเสบ", "โรคมะเร็ง", "ภูมิแพ้"] },
-    { q: "ข้อ 9.โรคใดอยู่ในกลุ่มที่มีระยะเวลารอคอย 120 วัน", a: "B", choices: ["ไข้หวัดใหญ่", "ริดสีดวงทวาร", "ภูมิแพ้อากาศ", "ไมเกรน"] },
-    { q: "ข้อ 10.ผู้มีเงินได้สามารถนำเบี้ยประกันชีวิตมาลดหย่อนภาษีได้สูงสุดเท่าใด", a: "C", choices: ["50,000 บาท", "80,000 บาท", "100,000 บาท", "150,000 บาท"] },
-    { q: "ข้อ 11.คำว่า อุบัติเหตุ ตามนิยามในสัญญาเพิ่มเติม หมายถึงข้อใด", a: "C", choices: ["เหตุการณ์ที่คาดการณ์ได้ล่วงหน้า", "เหตุการณ์ที่เกิดจากโรคประจำตัว", "เหตุการณ์ที่เกิดขึ้นอย่างฉับพลันจากปัจจัยภายนอกและไม่ได้เจตนา", "อาการเจ็บป่วยทุกชนิด"] },
-    { q: "ข้อ 12.ผู้ป่วยใน (IPD) โดยทั่วไปต้องเข้ารับการรักษาในโรงพยาบาลต่อเนื่องไม่น้อยกว่าเท่าใด", a: "D", choices: ["3 ชั่วโมง", "4 ชั่วโมง", "5 ชั่วโมง", "6 ชั่วโมง"] },
-    { q: "ข้อ 13.ข้อใดเป็นเหตุที่บริษัทสามารถปฏิเสธการจ่ายสินไหมได้", a: "A", choices: ["ผู้รับประโยชน์ฆ่าผู้เอาประกันภัยโดยเจตนา", "ลูกค้าจ่ายเบี้ยตรงเวลา", "ผู้เอาประกันภัยเปลี่ยนที่อยู่", "ลูกค้าแจ้งเบอร์โทรศัพท์ใหม่"] },
-    { q: "ข้อ 14.การเสนอขายประกันผ่านทางโทรศัพท์สามารถดำเนินการได้ในช่วงเวลาใด", a: "A", choices: ["ทุกวัน 08.00-20.00 น.", "จันทร์-เสาร์ 08.30-19.00 น.", "จันทร์-อาทิตย์ 09.00-18.00 น.", "จันทร์-ศุกร์ 08.30-17.00 น."] },
-    { q: "ข้อ 15.เมื่อได้รับอนุญาตจากผู้มุ่งหวังให้เสนอขายแล้ว ตัวแทนจะต้องดำเนินการใดก่อนเริ่มบันทึกเสียงสนทนา", a: "B", choices: ["บันทึกเสียงได้ทันที", "ขออนุญาตบันทึกเสียงและขอคำยืนยันอีกครั้ง", "แจ้งหัวหน้างานก่อน", "ส่ง SMS แจ้งลูกค้า"] }
-];
- // --- DOM Elements ---
-    const quizForm = document.getElementById('quizForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const loading = document.getElementById('loading');
-    const resultDiv = document.getElementById('result');
+        // ข้อมูลคำถาม ชุดที่ 7 (Underwriting)[cite: 32]
+        const questions = [
+            { q: "ข้อ 1.การพิจารณารับประกันภัย (Underwriting) หมายถึงข้อใด", a: "B", choices: ["การอนุมัติสินเชื่อให้ลูกค้า", "กระบวนการคัดเลือกความเสี่ยงที่บริษัทสามารถรับประกันได้", "การจ่ายค่าสินไหมให้ลูกค้า", "การคำนวณเบี้ยประกันภัย"] },
+            { q: "ข้อ 2.ข้อใดไม่ใช่ปัจจัยหลักในการพิจารณารับประกันภัย", a: "D", choices: ["อายุ", "อาชีพ", "ประวัติสุขภาพ", "ยี่ห้อรถยนต์ที่ใช้"] },
+            { q: "ข้อ 3.ช่องทาง Telesales โดยทั่วไปสามารถรับประกันภัยได้ถึงอายุเท่าใด", a: "C", choices: ["45 ปี", "50 ปี", "55 ปี", "60 ปี"] },
+            { q: "ข้อ 4.อาชีพใดต่อไปนี้เป็นตัวอย่างอาชีพที่ไม่สามารถรับสมัครประกันชีวิตได้", a: "C", choices: ["พนักงานบัญชี", "พนักงานธุรการ", "นักแสดงผาดโผน", "ครู"] },
+            { q: "ข้อ 5.ขั้นอาชีพใดมีความเสี่ยงมาตรฐานและไม่เพิ่มเบี้ยประกันภัย", a: "A", choices: ["ขั้นอาชีพ 1", "ขั้นอาชีพ 2", "ขั้นอาชีพ 3", "ขั้นอาชีพ 4"] },
+            { q: "ข้อ 6.ลูกค้ากลุ่มใดถือเป็น Vulnerable Customer", a: "C", choices: ["อายุ 35 ปี มีประกันชีวิตหลายฉบับ", "อายุ 45 ปี มีความรู้ทางการเงินดี", "อายุ 60 ปีขึ้นไป", "อายุ 30 ปี รายได้สูง"] },
+            { q: "ข้อ 7.เมื่อพบลูกค้ากลุ่มเปราะบางและลูกค้าต้องการให้มีบุคคลที่ไว้วางใจร่วมฟังการเสนอขาย ผู้เสนอขายควรทำอย่างไร", a: "D", choices: ["ดำเนินการขายต่อได้ทันที", "ขออนุญาตหัวหน้างานก่อน", "ส่งเอกสารให้ลูกค้าอ่านเอง", "รอจนบุคคลดังกล่าวเข้าร่วมฟังแล้วจึงเริ่มเสนอขาย"] },
+            { q: "ข้อ 8.ข้อใดเป็นตัวอย่างโรคที่ไม่สามารถรับประกันภัยได้", a: "C", choices: ["ไข้หวัด", "กระเพาะอาหารอักเสบ", "โรคมะเร็ง", "ภูมิแพ้"] },
+            { q: "ข้อ 9.โรคใดอยู่ในกลุ่มที่มีระยะเวลารอคอย 120 วัน", a: "B", choices: ["ไข้หวัดใหญ่", "ริดสีดวงทวาร", "ภูมิแพ้อากาศ", "ไมเกรน"] },
+            { q: "ข้อ 10.ผู้มีเงินได้สามารถนำเบี้ยประกันชีวิตมาลดหย่อนภาษีได้สูงสุดเท่าใด", a: "C", choices: ["50,000 บาท", "80,000 บาท", "100,000 บาท", "150,000 บาท"] },
+            { q: "ข้อ 11.คำว่า อุบัติเหตุ ตามนิยามในสัญญาเพิ่มเติม หมายถึงข้อใด", a: "C", choices: ["เหตุการณ์ที่คาดการณ์ได้ล่วงหน้า", "เหตุการณ์ที่เกิดจากโรคประจำตัว", "เหตุการณ์ที่เกิดขึ้นอย่างฉับพลันจากปัจจัยภายนอกและไม่ได้เจตนา", "อาการเจ็บป่วยทุกชนิด"] },
+            { q: "ข้อ 12.ผู้ป่วยใน (IPD) โดยทั่วไปต้องเข้ารับการรักษาในโรงพยาบาลต่อเนื่องไม่น้อยกว่าเท่าใด", a: "D", choices: ["3 ชั่วโมง", "4 ชั่วโมง", "5 ชั่วโมง", "6 ชั่วโมง"] },
+            { q: "ข้อ 13.ข้อใดเป็นเหตุที่บริษัทสามารถปฏิเสธการจ่ายสินไหมได้", a: "A", choices: ["ผู้รับประโยชน์ฆ่าผู้เอาประกันภัยโดยเจตนา", "ลูกค้าจ่ายเบี้ยตรงเวลา", "ผู้เอาประกันภัยเปลี่ยนที่อยู่", "ลูกค้าแจ้งเบอร์โทรศัพท์ใหม่"] },
+            { q: "ข้อ 14.การเสนอขายประกันผ่านทางโทรศัพท์สามารถดำเนินการได้ในช่วงเวลาใด", a: "A", choices: ["ทุกวัน 08.00-20.00 น.", "จันทร์-เสาร์ 08.30-19.00 น.", "จันทร์-อาทิตย์ 09.00-18.00 น.", "จันทร์-ศุกร์ 08.30-17.00 น."] },
+            { q: "ข้อ 15.เมื่อได้รับอนุญาตจากผู้มุ่งหวังให้เสนอขายแล้ว ตัวแทนจะต้องดำเนินการใดก่อนเริ่มบันทึกเสียงสนทนา", a: "B", choices: ["บันทึกเสียงได้ทันที", "ขออนุญาตบันทึกเสียงและขอคำยืนยันอีกครั้ง", "แจ้งหัวหน้างานก่อน", "ส่ง SMS แจ้งลูกค้า"] }
+        ];
 
-    // โหลดชื่อ และ ประสบการณ์ จาก Session / URL มาใส่ใน Input อัตโนมัติ (ถ้ามี)
-    document.addEventListener('DOMContentLoaded', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const storedName = urlParams.get('name') || sessionStorage.getItem('user_name');
-        if (storedName) {
-            document.getElementById('name').value = storedName;
+        const quizForm = document.getElementById('quizForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const resultDiv = document.getElementById('result');
+        const actionContainer = document.getElementById('actionContainer');
+        const nameInput = document.getElementById('name');
+        
+        const certificateWrapper = document.getElementById('certificate-wrapper');
+        const certName = document.getElementById('certName');
+        const certCourseName = document.getElementById('certCourseName');
+        const downloadCertBtn = document.getElementById('downloadCertBtn');
+        const quizHeader = document.getElementById('quizHeader').textContent;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const storedName = urlParams.get('name') || sessionStorage.getItem('user_name');
+            if (storedName) {
+                nameInput.value = storedName;
+            }
+        });
+
+        function renderQuiz() {
+            loading.classList.add('hidden');
+            quizForm.classList.remove('hidden');
+            submitBtn.classList.remove('hidden');
+
+            questions.forEach((q, index) => {
+                const container = document.createElement('div');
+                container.className = 'question-container';
+
+                const questionTitle = document.createElement('h3');
+                questionTitle.textContent = q.q;
+                container.appendChild(questionTitle);
+
+                const ul = document.createElement('ul');
+                ul.className = 'choices';
+
+                q.choices.forEach((choice, i) => {
+                    const li = document.createElement('li');
+                    const label = document.createElement('label');
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `question-${index}`;
+                    input.value = String.fromCharCode(65 + i);
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(` ${input.value}. ${choice}`));
+                    li.appendChild(label);
+                    ul.appendChild(li);
+                });
+
+                container.appendChild(ul);
+                quizForm.appendChild(container);
+            });
         }
-    });
+        
+        async function initialize() {
+            try {
+                const { data: { user }, error } = await supabase.auth.getUser();
+                if (user) currentUser = user;
+            } catch (e) {
+                console.warn("Could not retrieve current user.", e);
+            }
+            renderQuiz();
+        }
 
-    function renderQuiz() {
-        loading.classList.add('hidden');
-        quizForm.classList.remove('hidden');
-        submitBtn.classList.remove('hidden');
+        initialize();
 
-        questions.forEach((q, index) => {
-            const container = document.createElement('div');
-            container.className = 'question-container';
+        submitBtn.addEventListener('click', async () => {
+            const userNameVal = nameInput.value.trim();
+            if (!userNameVal) {
+                alert("กรุณากรอกชื่อผู้ทำแบบทดสอบก่อนส่งคำตอบครับ");
+                nameInput.focus();
+                return;
+            }
 
-            const questionTitle = document.createElement('h3');
-            questionTitle.textContent = q.q;
-            container.appendChild(questionTitle);
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'กำลังส่งคำตอบ...';
 
-            const ul = document.createElement('ul');
-            ul.className = 'choices';
+            let score = 0;
+            const answers = [];
 
-            q.choices.forEach((choice, i) => {
-                const li = document.createElement('li');
-                const label = document.createElement('label');
-                const input = document.createElement('input');
-                input.type = 'radio';
-                input.name = `question-${index}`;
-                input.value = String.fromCharCode(65 + i);
-                label.appendChild(input);
-                label.appendChild(document.createTextNode(`${input.value}. ${choice}`));
-                li.appendChild(label);
-                ul.appendChild(li);
+            questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="question-${index}"]:checked`);
+                const answer = selected ? selected.value : null; 
+                answers.push(answer);
+                if (answer === q.a) score++;
             });
 
-            container.appendChild(ul);
-            quizForm.appendChild(container);
-        });
-    }
-    
-    async function initialize() {
-        try {
-            const { data: { user }, error } = await supabase.auth.getUser();
-            if (user) {
-                currentUser = user;
-            }
-        } catch (e) {
-            console.warn("Could not retrieve current user. Running as anonymous.", e);
-        }
+            const totalQuestions = questions.length;
+            const percentage = Math.round((score / totalQuestions) * 100);
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || currentUser?.email || "anonymous@example.com";
+            const userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || "ไม่ระบุ";
 
-        renderQuiz();
-    }
+            try {
+                const { error } = await supabase
+                    .from('quiz_results')
+                    .insert([{
+                        user_email: userEmail,
+                        name: userNameVal,
+                        score: score,
+                        total_questions: totalQuestions,
+                        answers: answers,
+                        experience: userExperience,
+                        quiz_set: quizHeader
+                    }]);
 
-    initialize();
+                if (error) throw error; 
 
-    // --- Event Listener: Submit Button ---
-    submitBtn.addEventListener('click', async () => {
-        submitBtn.disabled = true;
+                if (percentage >= 80) {
+                    resultDiv.innerHTML = `🎉 ยินดีด้วย! คุณสอบผ่าน (${percentage}%) ได้คะแนน ${score} จาก ${totalQuestions} ข้อ`;
+                    resultDiv.style.backgroundColor = '#d1ffd1';
+                    resultDiv.style.color = '#005900';
+                    
+                    certName.textContent = userNameVal;
+                    certCourseName.textContent = quizHeader.replace('แบบทดสอบปรนัย: ', '').replace(/\s*\(.*\)/, '');
+                    
+                    certificateWrapper.style.display = 'block';
+                    quizForm.style.display = 'none';
+                    submitBtn.style.display = 'none';
+                } else {
+                    resultDiv.innerHTML = `❌ คุณได้คะแนน ${score} จาก ${totalQuestions} ข้อ (${percentage}%) ยังไม่ผ่านเกณฑ์ (ต้องได้ 80% ขึ้นไป)`;
+                    resultDiv.style.backgroundColor = '#ffd1d1';
+                    resultDiv.style.color = '#900';
+                    submitBtn.style.display = 'none';
 
-        let score = 0;
-        const answers = [];
-
-        // 1. คำนวณคะแนนและรวบรวมคำตอบ
-        questions.forEach((q, index) => {
-            const selected = document.querySelector(`input[name="question-${index}"]:checked`);
-            const answer = selected ? selected.value : null; 
-            answers.push(answer);
-            if (answer === q.a) score++;
-        });
-
-        const totalQuestions = questions.length;
-        
-        // 🔥 ดึงข้อมูล Email, Name และ Experience จาก URL Params หรือ sessionStorage
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        const userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || currentUser?.email || "anonymous@example.com";
-        const userName = document.getElementById('name').value.trim() || urlParams.get('name') || sessionStorage.getItem('user_name') || "ไม่ระบุชื่อ";
-        
-        // 🔥 ดึงค่าประสบการณ์ (Experience)
-        const userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || "ไม่ระบุ";
-
-        // 2. บันทึกผลลัพธ์โดยใช้ Supabase Client (แนบ experience ไปด้วย)
-        const { error } = await supabase
-            .from('quiz_results')
-            .insert([
-                {
-                    user_email: userEmail,
-                    name: userName,
-                    score: score,
-                    total_questions: totalQuestions,
-                    answers: answers,
-                    experience: userExperience // 🔥 บันทึกค่าประสบการณ์ลง Supabase ที่นี่!
+                    const retryBtn = document.createElement('button');
+                    retryBtn.textContent = 'ทำแบบทดสอบใหม่อีกครั้ง';
+                    retryBtn.style.backgroundColor = '#dc3545';
+                    retryBtn.onclick = () => location.reload();
+                    actionContainer.innerHTML = ''; 
+                    actionContainer.appendChild(retryBtn);
                 }
-            ]);
 
-        // 3. จัดการผลลัพธ์และการแสดงผล
-        if (error) {
-            console.error('Error saving quiz result:', error.message);
-            resultDiv.textContent = `เกิดข้อผิดพลาดในการบันทึกผล (รหัส: ${error.code}) กรุณาลองใหม่`;
-            resultDiv.style.backgroundColor = '#ffd1d1';
-            resultDiv.style.color = '#900';
-            submitBtn.disabled = false;
-        } else {
-            console.log("Quiz result saved successfully.");
-            resultDiv.textContent = `บันทึกผลสำเร็จ! คุณได้คะแนน ${score} จาก ${totalQuestions} ข้อ`;
-            resultDiv.style.backgroundColor = '#d1ffd1';
-            resultDiv.style.color = '#005900';
-        }
+                resultDiv.style.display = 'block';
 
-        resultDiv.style.display = 'block';
-    });
-</script>
+            } catch (err) {
+                console.error('Error saving quiz result:', err.message || err);
+                resultDiv.textContent = `เกิดข้อผิดพลาดในการบันทึกผล (ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต) กรุณาลองใหม่`;
+                resultDiv.style.backgroundColor = '#ffd1d1';
+                resultDiv.style.color = '#900';
+                resultDiv.style.display = 'block';
+                
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'ส่งคำตอบ';
+            }
+        });
+
+        downloadCertBtn.addEventListener('click', () => {
+            window.print();
+        });
+    </script>
 </body>
 </html>
