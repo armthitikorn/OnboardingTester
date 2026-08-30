@@ -31,6 +31,7 @@
             color: #0059b3;
             margin-bottom: 10px;
             font-size: 1.1rem;
+            line-height: 1.5;
         }
         .choices {
             list-style: none;
@@ -111,7 +112,7 @@
 
     <div style="margin-bottom: 20px;">
         <label for="name">ชื่อผู้ทำแบบทดสอบ:</label>
-        <input type="text" id="name" name="name" required style="width:100%;padding:10px;margin-top:5px;">
+        <input type="text" id="name" name="name" required style="width:100%;padding:10px;margin-top:5px;" placeholder="กรุณากรอกชื่อ-นามสกุล">
     </div>
     
     <form id="quizForm" class="hidden"></form>
@@ -136,7 +137,7 @@
 
         // --- Supabase Setup ---
         const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
-        const supabaseKey = 'YOUR_SUPABASE_KEY'; // ⚠️ อย่าลืมใส่ Supabase Key ของคุณ
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
         const supabase = createClient(supabaseUrl, supabaseKey);
 
         let currentUser = null;
@@ -173,12 +174,13 @@
         const certName = document.getElementById('certName');
         const downloadCertBtn = document.getElementById('downloadCertBtn');
         const actionContainer = document.getElementById('actionContainer');
+        const nameInput = document.getElementById('name');
 
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const storedName = urlParams.get('name') || sessionStorage.getItem('user_name');
             if (storedName) {
-                document.getElementById('name').value = storedName;
+                nameInput.value = storedName;
             }
         });
 
@@ -206,7 +208,7 @@
                     input.name = `question-${index}`;
                     input.value = String.fromCharCode(65 + i);
                     label.appendChild(input);
-                    label.appendChild(document.createTextNode(`${input.value}. ${choice}`));
+                    label.appendChild(document.createTextNode(` ${input.value}. ${choice}`));
                     li.appendChild(label);
                     ul.appendChild(li);
                 });
@@ -232,11 +234,21 @@
 
         // --- Event Listener: Submit Button ---
         submitBtn.addEventListener('click', async () => {
+            // ดัก Error ก่อนส่ง: ตรวจสอบว่ากรอกชื่อแล้วหรือยัง
+            const userNameVal = nameInput.value.trim();
+            if (!userNameVal) {
+                alert("กรุณากรอกชื่อผู้ทำแบบทดสอบก่อนส่งคำตอบครับ");
+                nameInput.focus();
+                return;
+            }
+
             submitBtn.disabled = true;
+            submitBtn.textContent = 'กำลังส่งคำตอบ...'; // เปลี่ยนข้อความปุ่มให้รู้ว่าระบบกำลังทำงาน
 
             let score = 0;
             const answers = [];
 
+            // คำนวณคะแนน
             questions.forEach((q, index) => {
                 const selected = document.querySelector(`input[name="question-${index}"]:checked`);
                 const answer = selected ? selected.value : null; 
@@ -245,70 +257,78 @@
             });
 
             const totalQuestions = questions.length;
-            const percentage = (score / totalQuestions) * 100; // คำนวณเปอร์เซ็นต์
+            const percentage = Math.round((score / totalQuestions) * 100); // คำนวณเปอร์เซ็นต์แบบปัดเศษ
             
             const urlParams = new URLSearchParams(window.location.search);
             const userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || currentUser?.email || "anonymous@example.com";
-            const userName = document.getElementById('name').value.trim() || urlParams.get('name') || sessionStorage.getItem('user_name') || "ไม่ระบุชื่อ";
             const userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || "ไม่ระบุ";
 
-            // บันทึกผลลัพธ์ลง Supabase
-            const { error } = await supabase
-                .from('quiz_results')
-                .insert([
-                    {
-                        user_email: userEmail,
-                        name: userName,
-                        score: score,
-                        total_questions: totalQuestions,
-                        answers: answers,
-                        experience: userExperience
-                    }
-                ]);
+            try {
+                // บันทึกผลลัพธ์ลง Supabase
+                const { error } = await supabase
+                    .from('quiz_results')
+                    .insert([
+                        {
+                            user_email: userEmail,
+                            name: userNameVal,
+                            score: score,
+                            total_questions: totalQuestions,
+                            answers: answers,
+                            experience: userExperience
+                        }
+                    ]);
 
-            if (error) {
-                console.error('Error saving quiz result:', error.message);
-                resultDiv.textContent = `เกิดข้อผิดพลาดในการบันทึกผล (รหัส: ${error.code}) กรุณาลองใหม่`;
+                // โยน Error ไปเข้า Catch หาก Supabase ตีกลับ
+                if (error) throw error; 
+
+                // เงื่อนไขการผ่านเกณฑ์ 80% ขึ้นไป
+                if (percentage >= 80) {
+                    resultDiv.innerHTML = `🎉 ยินดีด้วย! คุณสอบผ่าน (${percentage}%) ได้คะแนน ${score} จาก ${totalQuestions} ข้อ`;
+                    resultDiv.style.backgroundColor = '#d1ffd1';
+                    resultDiv.style.color = '#005900';
+                    
+                    // แสดงใบประกาศนียบัตร
+                    certName.textContent = userNameVal;
+                    certificate.style.display = 'block';
+
+                    // ซ่อนฟอร์มคำถาม
+                    quizForm.style.display = 'none';
+                    submitBtn.style.display = 'none';
+                } else {
+                    resultDiv.innerHTML = `❌ คุณได้คะแนน ${score} จาก ${totalQuestions} ข้อ (${percentage}%) ยังไม่ผ่านเกณฑ์ (ต้องได้ 80% ขึ้นไป)`;
+                    resultDiv.style.backgroundColor = '#ffd1d1';
+                    resultDiv.style.color = '#900';
+                    submitBtn.style.display = 'none';
+
+                    // สร้างปุ่มให้ทำแบบทดสอบใหม่
+                    const retryBtn = document.createElement('button');
+                    retryBtn.textContent = 'ทำแบบทดสอบใหม่อีกครั้ง';
+                    retryBtn.style.backgroundColor = '#dc3545';
+                    retryBtn.onclick = () => location.reload();
+                    actionContainer.innerHTML = ''; 
+                    actionContainer.appendChild(retryBtn);
+                }
+
+                resultDiv.style.display = 'block';
+
+            } catch (err) {
+                // ดักจับ Error กรณี Supabase มีปัญหา เน็ตหลุด หรือ API Key ผิด
+                console.error('Error saving quiz result:', err.message || err);
+                resultDiv.textContent = `เกิดข้อผิดพลาดในการบันทึกผล (ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตหรือ Supabase Key) กรุณาลองใหม่`;
                 resultDiv.style.backgroundColor = '#ffd1d1';
                 resultDiv.style.color = '#900';
-                submitBtn.disabled = false;
-                return;
-            }
-
-            // เงื่อนไขการผ่านเกณฑ์ 80% ขึ้นไป
-            if (percentage >= 80) {
-                resultDiv.innerHTML = `🎉 ยินดีด้วย! คุณสอบผ่าน (${percentage.format ? '' : percentage}%) ได้คะแนน ${score} จาก ${totalQuestions} ข้อ`;
-                resultDiv.style.backgroundColor = '#d1ffd1';
-                resultDiv.style.color = '#005900';
+                resultDiv.style.display = 'block';
                 
-                // แสดงใบประกาศนียบัตร
-                certName.textContent = userName;
-                certificate.style.display = 'block';
-
-                // ซ่อนฟอร์มคำถาม
-                quizForm.style.display = 'none';
-                submitBtn.style.display = 'none';
-            } else {
-                resultDiv.innerHTML = `❌ คุณได้คะแนน ${score} จาก ${totalQuestions} ข้อ (${percentage}%) ยังไม่ผ่านเกณฑ์ (ต้องได้ 80% ขึ้นไป)`;
-                resultDiv.style.backgroundColor = '#ffd1d1';
-                resultDiv.style.color = '#900';
-                submitBtn.style.display = 'none';
-
-                // สร้างปุ่มให้ทำแบบทดสอบใหม่
-                const retryBtn = document.createElement('button');
-                retryBtn.textContent = 'ทำแบบทดสอบใหม่อีกครั้ง';
-                retryBtn.style.backgroundColor = '#dc3545';
-                retryBtn.onclick = () => location.reload();
-                actionContainer.appendChild(retryBtn);
+                // คืนค่าปุ่มให้กดใหม่ได้
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'ส่งคำตอบ';
             }
-
-            resultDiv.style.display = 'block';
         });
 
         // จำลองปุ่มดาวน์โหลดใบประกาศ
         downloadCertBtn.addEventListener('click', () => {
             alert('กำลังดาวน์โหลดใบประกาศนียบัตร...');
-            // สามารถเพิ่มโค้ดสำหรับ Print หรือดาวน์โหลดเป็น PDF ได้ที่นี่
+            window.print(); // ตัวอย่างใช้ฟังก์ชัน Print ของเบราว์เซอร์ไปก่อนได้ครับ
         });
     </script>
 </body>
