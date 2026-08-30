@@ -132,33 +132,15 @@
         }
         
 @media print {
-            /* 1. ซ่อนเนื้อหาอื่นนอกเหนือจากใบประกาศ */
-            body > *:not(#certificate-wrapper) {
-                display: none !important;
-            }
-            
-            /* 2. บังคับซ่อนปุ่มทุุกชนิดและลิงก์ตอนสั่งพรินต์ */
-            #certificate-wrapper button, 
-            #certificate-wrapper a {
-                display: none !important;
-            }
-            
+            /* 1. ซ่อนทุกอย่างบนหน้าเว็บ เพื่อล้างพื้นที่ */
             body {
+                visibility: hidden;
                 background: #fff;
                 margin: 0;
-                padding: 0;
             }
             
-            /* 3. จัดกึ่งกลางหน้ากระดาษใหม่แบบเสถียรสุด */
-            #certificate-wrapper {
-                display: block !important;
-                width: 100%;
-                text-align: center;
-                margin: 0;
-                padding: 20px 0; /* เพิ่มพื้นที่ด้านบนนิดหน่อยให้ดูสวยงาม */
-            }
-            
-#certificate {
+            /* 2. บังคับให้ใบประกาศโชว์ขึ้นมา และจับขึงกึ่งกลางแบบตายตัว */
+            #certificate {
                 visibility: visible;
                 position: absolute !important;
                 top: 50% !important;
@@ -169,11 +151,11 @@
                 box-shadow: none !important;
                 margin: 0 !important;
             }
-            
-            /* 4. ปรับหน้ากระดาษ และตั้ง margin: 0 เพื่อซ่อนวันที่/URL ของเบราว์เซอร์ */
+
+            /* 3. ลบขอบกระดาษ เพื่อไม่ให้มี วันที่ และ URL ของเบราว์เซอร์ติดมา */
             @page {
                 size: A4 landscape;
-                margin: 0mm; 
+                margin: 0;
             }
         }
     </style>
