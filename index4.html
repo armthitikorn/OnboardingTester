@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>แบบทดสอบ</title>
+    <title>แบบทดสอบ: PRUClick Savings Plus 20/9</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* โค้ด CSS สไตล์เดิม */
         body {
             font-family: 'Sarabun', sans-serif;
             max-width: 900px;
@@ -31,6 +30,7 @@
             color: #0059b3;
             margin-bottom: 10px;
             font-size: 1.1rem;
+            line-height: 1.5;
         }
         .choices {
             list-style: none;
@@ -90,24 +90,112 @@
         .hidden {
             display: none;
         }
+        
+        /* สไตล์สำหรับใบประกาศนียบัตรจำลอง */
+        #certificate-wrapper {
+            display: none;
+            text-align: center;
+            margin-top: 40px;
+        }
+        #certificate {
+            background: #fff;
+            border: 15px solid #004080;
+            padding: 15px;
+            text-align: center;
+            border-radius: 4px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .cert-inner {
+            border: 2px solid #d4af37;
+            padding: 50px 30px;
+            background-color: #faf9f5;
+        }
+        .cert-title {
+            color: #d4af37; 
+            font-family: 'Georgia', serif; 
+            font-size: 2.5rem; 
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .cert-name {
+            color: #004080; 
+            font-size: 2rem;
+            border-bottom: 2px solid #004080; 
+            display: inline-block; 
+            padding: 0 40px 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        @media print {
+            body { background: #fff; }
+            body * { visibility: hidden; }
+            #certificate, #certificate * { visibility: visible; }
+            #certificate {
+                position: absolute;
+                left: 50%;
+                top: 40%;
+                transform: translate(-50%, -50%);
+                width: 100%;
+                box-shadow: none;
+            }
+            @page {
+                size: landscape;
+                margin: 0mm;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <h2>แบบทดสอบปรนัย: PRUMhao Mhao Double Sure (25 ข้อ)</h2>
+    <h2 id="quizHeader">แบบทดสอบปรนัย: PRUClick Savings Plus 20/9 (20 ข้อ)</h2>
 
     <div id="loading" class="loading-text">กำลังโหลดแบบทดสอบ...</div>
 
-    <div style="margin-bottom: 20px;"><label for="name">ชื่อผู้ทำแบบทดสอบ:</label><input type="text" id="name" name="name" required style="width:100%;padding:10px;margin-top:5px;"></div>
-<form id="quizForm" class="hidden"></form>
+    <div style="margin-bottom: 20px;">
+        <label for="name">ชื่อผู้ทำแบบทดสอบ:</label>
+        <input type="text" id="name" name="name" required style="width:100%;padding:10px;margin-top:5px;" placeholder="กรุณากรอกชื่อ-นามสกุล">
+    </div>
+    
+    <form id="quizForm" class="hidden"></form>
 
     <button id="submitBtn" class="hidden">ส่งคำตอบ</button>
 
     <div id="result"></div>
-    
-    <a href="index4.html">
-        <button style="margin-top: 20px;">ไปหน้าถัดไป</button>
-    </a>
+    <div id="actionContainer" style="text-align: center; margin-top: 20px;"></div>
+
+    <!-- ส่วนแสดงใบประกาศนียบัตร -->
+    <div id="certificate-wrapper">
+        <div id="certificate">
+            <div class="cert-inner">
+                <h1 class="cert-title">Certificate of Achievement</h1>
+                <p style="font-size: 1.2rem; color: #555; margin-top: 20px;">ขอมอบประกาศนียบัตรฉบับนี้เพื่อให้เกียรติว่า</p>
+                <h2 id="certName" class="cert-name">-</h2>
+                <p style="font-size: 1.2rem; color: #555; margin-top: 10px;">
+                    ได้ผ่านการทดสอบหลักสูตร <br> 
+                    <strong id="certCourseName" style="color: #333; font-size: 1.5rem;">-</strong> <br> 
+                    ด้วยคะแนนที่ผ่านเกณฑ์มาตรฐานอย่างสมบูรณ์
+                </p>
+                <div style="margin-top: 50px; text-align: center;">
+                    <div style="display: inline-block; width: 200px; border-top: 1px solid #333; padding-top: 10px; margin: 0 20px;">
+                        <p style="margin: 0; font-size: 0.9rem;">Prudential Life Assurance</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button id="downloadCertBtn" style="background-color: #28a745; max-width: 250px; margin: 30px auto;">
+            📥 ดาวน์โหลดใบประกาศ
+        </button>
+        <!-- ลิงก์สำหรับไปชุดที่ 4 -->
+        <a href="index4.html" id="nextPageLink" style="text-decoration: none;">
+            <button style="margin-top: 10px; background-color: #007acc; max-width: 250px; margin: 10px auto;">ไปหน้าถัดไป (ชุดที่ 4)</button>
+        </a>
+    </div>
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -119,153 +207,182 @@
 
         let currentUser = null;
 
-        // ข้อมูลคำถาม (ใช้ข้อมูลเดิมทั้งหมด)
-const questions = [
-    { q: "1. “ผลประโยชน์สูงสุดต่อปี” หมายถึงอะไร?", a: "B", choices: ["วงเงินสูงสุดที่จ่ายต่อครั้ง", "วงเงินสูงสุดที่จ่ายต่อปีตามแผนที่เลือก", "วงเงินสูงสุดที่จ่ายต่อวัน", "วงเงินสูงสุดที่จ่ายต่อเดือน"] },
-    { q: "2. แผน 5 แสน มีค่าห้องผู้ป่วยในต่อวันเท่าไร?", a: "B", choices: ["2,000 บาท", "2.500 บาท", "5,000 บาท", "6,000 บาท"] },
-    { q: "3. แผน 2 ล้าน มีค่าห้องผู้ป่วยในต่อวันเท่าไร?", a: "D", choices: ["3,000 บาท", "4,000 บาท", "5,000 บาท", "6,000 บาท"] },
-    { q: "4. หมวด 1 ครอบคลุมอะไร?", a: "B", choices: ["ค่าห้อง ICU", "ค่าห้องและอาหารผู้ป่วยใน", "ค่ารักษาพยาบาลทั่วไป", "ค่าผ่าตัดเล็ก"] },
-    { q: "5. หมวด 2 ครอบคลุมอะไร?", a: "A", choices: ["ค่าวินิจฉัยและบำบัดรักษาพยาบาล", "ค่าห้องผู้ป่วยใน", "ค่ารักษาพยาบาลแบบ Day Surgery", "ค่ารักษาพยาบาลกรณีอุบัติเหตุ"] },
-    { q: "6. หมวด 3 ครอบคลุมค่าใช้จ่ายประเภทใด?", a: "B", choices: ["ค่าห้อง ICU", "ค่าแพทย์เยี่ยมไข้", "ค่ารักษาพยาบาลแบบ Day Surgery", "ค่ารักษาพยาบาลกรณีอุบัติเหตุ"] },
-    { q: "7. หมวด 5 ให้ความคุ้มครองในกรณีใด?", a: "B", choices: ["ค่าห้อง ICU", "ค่ารักษาพยาบาลแบบ Day Surgery", "ค่ารักษาพยาบาลกรณีอุบัติเหตุ", "ค่ารักษาพยาบาลแบบ Day Case"] },
-    { q: "8. หมวด 7 ให้ความคุ้มครองในกรณีใด?", a: "A", choices: ["อุบัติเหตุฉุกเฉิน ภายใน 24 ชั่วโมง", "ผ่าตัดเล็ก", "ค่าห้อง ICU", "ค่ารักษาพยาบาลกรณีทำฟัน"] },
-    { q: "9. หมวด 9 ครอบคลุมค่าใช้จ่ายประเภทใด?", a: "A", choices: ["ค่าล้างไตผ่านเส้นเลือด", "ค่ากายภาพบำบัด", "ค่ารักษาพยาบาลแบบ Day Surgery", "ค่าห้อง ICU"] },
-    { q: "10. หมวด 11 ครอบคลุมอะไร?", a: "C", choices: ["ทำคีโมมะเร็งผิวหนัง", "ฉายแสงหลังผ่าตัดไส้ติ่ง", "หลังจากทำคีโมหมอแนะนำให้ทำ target therapy", "ผ่าตัดเล็ก"] },
-    { q: "11. แผน 8 แสน ค่าห้อง ICU ต่อวันเท่าไร?", a: "D", choices: ["2,000 บาท", "3,000 บาท", "5,000 บาท", "6,000 บาท"] },
-    { q: "12. ถ้าลูกค้าเลือกแผน 1 ล้าน และนอนโรงพยาบาล 10 วัน ค่าห้องรวมเท่าไร?", a: "C", choices: ["30,000 บาท", "40,000 บาท", "50,000 บาท", "60,000 บาท"] },
-    { q: "13. เงื่อนไขการจ่ายค่าห้องผู้ป่วยในสูงสุดกี่วันต่อปี?", a: "A", choices: ["365 วัน", "60 วัน", "90 วัน", "120 วัน"] },
-    { q: "14. เงื่อนไขการจ่ายค่าห้อง ICU สูงสุดกี่วันต่อปี?", a: "A", choices: ["90 วัน", "99 วัน", "30 วัน", "60 วัน"] },
-    { q: "15. หมวด 6 ครอบคลุมอะไร?", a: "C", choices: ["ค่ายา 30 วันหลังจาก IPD", "ค่าวินิจฉัยก่อนเข้า IPD ด้วยสาเหตุเดียวกัน 30 วัน", "ค่า Follow หลัง IPD ด้วยสาเหตุเดียวกัน 30 วัน", "B และ C ถูก"] },
-    { q: "16. ถ้าลูกค้าเลือกแผน 2 ล้าน และมีค่ารักษาพยาบาลรวม 1.8 ล้าน จะได้รับการจ่ายเต็มหรือไม่?", a: "D", choices: ["ไม่จ่าย", "จ่ายบางส่วน", "จ่ายเต็ม", "ขึ้นอยู่กับเงื่อนไขหมวด 1"] },
-    { q: "17. หมวด 8 ให้ความคุ้มครองในกรณีใด?", a: "D", choices: ["เจ็บป่วย IPD", "อุบัติเหตุจากการขับขี่จักรยานยนต์ IPD", "โรคร้าย IPD", "ถูกทุกข้อ"] },
-    { q: "18. หมวด 12 ครอบคลุมอะไร?", a: "C", choices: ["อุบัติเหตุจากการเล่นกีฬา", "อุบัติเหตุจากการขับขี่จักรยานยนต์", "เจ็บป่วยและอุบัติเหตุฉุกเฉิน", "ผ่าตัดเล็ก"] },
-    { q: "19. ถ้าลูกค้าเลือกแผน 5 แสน และเข้ารับการรักษาแบบ Day Surgery จะได้รับวงเงินสูงสุดเท่าไร?", a: "B", choices: ["300,000 บาท", "500,000 บาท", "800,000 บาท", "1,000,000 บาท"] },
-    { q: "20. ทำไมต้องเลือกแผนที่เหมาะสมกับความต้องการของลูกค้า?", a: "B", choices: ["เพื่อให้จ่ายเบี้ยประกันน้อยที่สุด", "เพื่อให้ได้รับความคุ้มครองเพียงพอและลดความเสี่ยงค่าใช้จ่ายส่วนเกิน", "เพื่อให้ได้สิทธิพิเศษจากโรงพยาบาล", "เพื่อให้ได้วงเงินสูงสุดเท่านั้น"] },
-    { q: "21.Bonus No Clam มีเงื่อนไขอย่างไร?", a: "B", choices: ["ไม่เคลมทุกปีมีส่วนลด 10%", "ไม่เคลมต่อเนื่อง 2 ปีมีส่วนลด 10%", "ไม่เคลมต่อเนื่อง 2 ปี มีเงินคืนให้ 10%", "ไม่มีข้อถูก"] },
-    { q: "22. Deductible คืออะไร", a: "C", choices: ["ความรับผิดส่วนแรกของการซื้อประกัน", "เงินส่วนแรกที่ต้องจ่ายเบี้ยประกัน", "ค่าใช้จ่ายส่วนแรกของค่ารักษาพยาลาลที่ต้องจ่ายก่อนเคลม", "ค่าบริการส่วนแรกของ ร.พ."] },
-    { q: "23. รัตนาต้องการซื้อ พรูเหมาเหมาดับเบิลชัวร์ ให้กับลูกชายอายุ 5 ขวบ เราจะอธิบายว่าอย่างไร?", a: "C", choices: ["สามารถทำได้แบบ Full Coverage", "สามารถทำได้แบบ Deductible", "ต้องรอให้บุตรอายุครบ 6 ปีก่อนถึงสามารถทำได้", "คุณรัตนาต้องทำก่อนถึงสามารถทำให้บุตรได้"] },
-    { q: "24. หากได้รับการแจ้งจาก บริษัทว่าปีถัดไปจะต้องมีส่วนร่วมจ่ายค่ารักษาพยาบาล และได้ซื้อแบบ Deductible ไว้หากต้องการเคลมขอไดอธิบายถูกต้อง?", a: "B", choices: ["จ่าย ส่วนร่วมจายก่อนค่อยจ่าย Deductible", "จ่าย Deductible ค่อยจ่าย ส่วนร่วมจ่าย", "จ่ายพร้อมกัน", "ถูกทุกข้อ"] },
-    { q: "25. หากเคลมค่ารักษามาตรฐานจนหมด เหลือเพียงตัวท็อปอัพโรคร้ายแรง เกิดอุบัติเหตุต้องเข้ารักษาตัวใน รพ. จะสามาถใช้วงเงินค่ารักษาได้หรือไม่", a: "C", choices: ["ใช้ได้ปกติ", "สามารถใช้ตัวท็อปอัพโรคร้ายรักษาไปก่อนได้", "ยังไม่สารมารถใช้วงเงินค่ารักษามาตรฐานได้เนื่องจากได้ใช้หมดไปแล้วแนะนำลูกค้าใช้สวัสอดิการณ์ตัวอื่นก่อน", "ขอใช้วงเงินล่วงหน้าก่อนได้"] }
-]; // --- DOM Elements ---
-    const quizForm = document.getElementById('quizForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const loading = document.getElementById('loading');
-    const resultDiv = document.getElementById('result');
+        // ข้อมูลคำถาม ชุดที่ 3
+        const questions = [
+            { q: "1. แบบประกัน PRUClick Savings Plus 20/9 เป็นประกันชนิดใด ?จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "A", choices: ["ไม่มีเงินปันผล", "มีเงินปันผล", "สามัญ", "อุตสาหกรรม"] },
+            { q: "2. แบบประกัน PRUClick Savings Plus มีระยะเวลาการชำระเบี้ยกี่ปี ?จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "C", choices: ["7", "8", "9", "10"] },
+            { q: "3. แบบประกัน PRUClick Savings Plus มีระยะเวลาเอาประกันกี่ปี ?จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "C", choices: ["10", "15", "20", "25"] },
+            { q: "4.  เงินคืนระหว่างสัญญาปีที่ 2 – 9  กี่ % ? จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "B", choices: ["1%", "2.5%", "5%", "6%"] },
+            { q: "5. เงินคืนระหว่างสัญญาปีที่ 10 – 19  กี่ % ? จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "B", choices: ["3 %", "5 %", "7 %", "9 %"] },
+            { q: "6. เงินครบกำหนดปีกรมธรรม์ที่ 20 ผลประโยชน์ที่จะได้รับได้กี่คือข้อใด ? จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "B", choices: ["100% ของจำนวนเงินเอาประกัน", "200% ของจำนวนเงินเอาประกัน", "300% ของจำนวนเงินเอาประกัน", "400% ของจำนวนเงินเอาประกัน"] },
+            { q: "7. กรณีผู้เอาประกันเสียชีวิต (ไม่ใช่อุบัติเหตุ) ปี กธ.ที่ 1 - 2  บริษัทจะจ่ายผลประโยชน์ในข้อใด ? จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "B", choices: ["ร้อยละ 100 ของเบี้ยประกันภัยของกรมธรรม์ที่ชำระมาแล้วทั้งหมด", "ร้อยละ 110 ของเบี้ยประกันภัยของกรมธรรม์ที่ชำระมาแล้วทั้งหมด", "ร้อยละ 120 ของเบี้ยประกันภัยของกรมธรรม์ที่ชำระมาแล้วทั้งหมด", "ร้อยละ 130 ของเบี้ยประกันภัยของกรมธรรม์ที่ชำระมาแล้วทั้งหมด"] },
+            { q: "8. กรณีผู้เอาประกันเสียชีวิตจากอุบัติเหตุ ปี กธ. ที่ 1 - 9 บริษัทจะจ่ายผลประโยชน์เพิ่มในข้อใด ? จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "A", choices: ["100% ของจำนวนเงินเอาประกันภัย", "110% ของจำนวนเงินเอาประกันภัย", "115% ของจำนวนเงินเอาประกันภัย", "120% ของจำนวนเงินเอาประกันภัย"] },
+            { q: "9. อายุรับประกันภัยของแบบประกันนี้ คือข้อใด ?จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "C", choices: ["15 - 50 ปี", "20 - 50 ปี", "20 - 60 ปี", "25 - 60 ปี"] },
+            { q: "10. จำนวนเงินเอาประกันภัยขั้นต่ำของแบบประกันนี้คือข้อใด ?จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "B", choices: ["25,000 บาท", "50,000 บาท", "75,000 บาท", "100,000 บาท"] },
+            { q: "11. จำนวนเงินเอาประกันภัยสูงสุดของแบบประกันนี้คือข้อใด ?จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "D", choices: ["200,000 บาท", "300,000 บาท", "400,000 บาท", "500,000 บาท"] },
+            { q: "12. แบบประกัน PRUClick Savings Plus 20/9 สามารถนำเบี้ยประกันไปหักลดหย่อนภาษีได้สูงสุด กี่บาท ?จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "A", choices: ["100,000", "150,000", "200,000", "250,000"] },
+            { q: "13. แบบประกันนี้สามารถกู้ได้สูงสุดกี่ % ของมูลค่าเงินเวนคืน ?จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "C", choices: ["70", "80", "90", "100"] },
+            { q: "14. สิทธิในการขอยกเลิกกรมธรรม์ (Free Look Period) ภายในกี่วัน ?จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "A", choices: ["30", "15", "10", "5"] },
+            { q: "15. กรณีที่ผู้เอาประกันภัยเวนคืนกรมธรรม์ก่อนครบกำหนดสัญญา ผู้เอาประกันภัยจะได้รับเงินคืน ณ วันครบรอบปีกรมธรรม์นั้นหรือไม่ ?จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "B", choices: ["ได้รับ", "ไม่ได้รับ", "ได้รับบางส่วน", "ได้หรือไม่ได้ขึ้นอยู่กับบริษัท"] },
+            { q: "16. การรับเงินคืนระหว่างสัญญาเริ่มต้นในปีกรมธรรม์ที่เท่าไร?จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "B", choices: ["วันครบรอบปี กธ. ที่ 1", "วันครบรอบปี กธ. ที่ 2", "วันครบรอบปี กธ. ที่ 3", "วันครบรอบปี กธ. ที่ 4"] },
+            { q: "17. ชั้นอาชีพที่สามารถซื้อ PRUClick Savings Plus 20/9 ได้คือข้อใดจำเป็นต้องตอบ. ทางเลือกเดียว.", a: "B", choices: ["ได้เฉพาะชั้นอาชีพ 1 เท่านั้น", "ได้เฉพาะชั้นอาชีพ 2 เท่านั้น", "ได้เฉพาะชั้นอาชีพ 3 - 4 เท่านั้น", "รับประกันชั้นอาชีพ 1 - 4"] },
+            { q: "18. บริษัทจะไม่จ่ายผลประโยชน์กรณีเสียชีวิตจากอุบัติเหตุ เมื่อปรากฏว่า พบปริมาณแอลกอฮอล์ในเลือดตั้งแต่กี่ มิลลิกรัม % ขั้นไปจำเป็นต้องตอบ. ทางเลือกเดียว.", a: "B", choices: ["100", "150", "200", "250"] },
+            { q: "19. หากผู้เอาประกันเสียชีวิตด้วยอุบัติเหตุ ในขณะที่ตนเองขับขี่หรือ โดยสารรถจักรยานยนต์ บริษัทจะจ่ายผลประโยชน์ข้อใด ?จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "A", choices: ["บริษัทจะไม่จ่ายผลประโยชน์กรณีเสียชีวิตจากอุบัติเหตุ", "จ่ายมูลค่าขยายเวลา", "จ่ายมูลค่าเวณคืน", "จ่ายมูลค่าไถ่ถอนกรมธรรม์"] },
+            { q: "20. ผู้เอาประกันสามารถเลือกชำระเบี้ยประกันชีวิตได้อย่างไรบ้าง จำเป็นต้องตอบ. ทางเลือกเดียว.", a: "D", choices: ["จ่ายเบี้ยรายปี", "จ่ายเบี้ยราย 6 เดือน หรือราย 3 เดือน", "จ่ายเบี้ยรายเดือน", "ถูกทุกข้อ"] }
+        ];
 
-    // โหลดชื่อ และ ประสบการณ์ จาก Session / URL มาใส่ใน Input อัตโนมัติ (ถ้ามี)
-    document.addEventListener('DOMContentLoaded', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const storedName = urlParams.get('name') || sessionStorage.getItem('user_name');
-        if (storedName) {
-            document.getElementById('name').value = storedName;
+        const quizForm = document.getElementById('quizForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const resultDiv = document.getElementById('result');
+        const actionContainer = document.getElementById('actionContainer');
+        const nameInput = document.getElementById('name');
+        
+        const certificateWrapper = document.getElementById('certificate-wrapper');
+        const certName = document.getElementById('certName');
+        const certCourseName = document.getElementById('certCourseName');
+        const downloadCertBtn = document.getElementById('downloadCertBtn');
+        const quizHeader = document.getElementById('quizHeader').textContent;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const storedName = urlParams.get('name') || sessionStorage.getItem('user_name');
+            if (storedName) {
+                nameInput.value = storedName;
+            }
+        });
+
+        function renderQuiz() {
+            loading.classList.add('hidden');
+            quizForm.classList.remove('hidden');
+            submitBtn.classList.remove('hidden');
+
+            questions.forEach((q, index) => {
+                const container = document.createElement('div');
+                container.className = 'question-container';
+
+                const questionTitle = document.createElement('h3');
+                questionTitle.textContent = q.q;
+                container.appendChild(questionTitle);
+
+                const ul = document.createElement('ul');
+                ul.className = 'choices';
+
+                q.choices.forEach((choice, i) => {
+                    const li = document.createElement('li');
+                    const label = document.createElement('label');
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `question-${index}`;
+                    input.value = String.fromCharCode(65 + i);
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(` ${input.value}. ${choice}`));
+                    li.appendChild(label);
+                    ul.appendChild(li);
+                });
+
+                container.appendChild(ul);
+                quizForm.appendChild(container);
+            });
         }
-    });
+        
+        async function initialize() {
+            try {
+                const { data: { user }, error } = await supabase.auth.getUser();
+                if (user) currentUser = user;
+            } catch (e) {
+                console.warn("Could not retrieve current user.", e);
+            }
+            renderQuiz();
+        }
 
-    function renderQuiz() {
-        loading.classList.add('hidden');
-        quizForm.classList.remove('hidden');
-        submitBtn.classList.remove('hidden');
+        initialize();
 
-        questions.forEach((q, index) => {
-            const container = document.createElement('div');
-            container.className = 'question-container';
+        submitBtn.addEventListener('click', async () => {
+            const userNameVal = nameInput.value.trim();
+            if (!userNameVal) {
+                alert("กรุณากรอกชื่อผู้ทำแบบทดสอบก่อนส่งคำตอบครับ");
+                nameInput.focus();
+                return;
+            }
 
-            const questionTitle = document.createElement('h3');
-            questionTitle.textContent = q.q;
-            container.appendChild(questionTitle);
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'กำลังส่งคำตอบ...';
 
-            const ul = document.createElement('ul');
-            ul.className = 'choices';
+            let score = 0;
+            const answers = [];
 
-            q.choices.forEach((choice, i) => {
-                const li = document.createElement('li');
-                const label = document.createElement('label');
-                const input = document.createElement('input');
-                input.type = 'radio';
-                input.name = `question-${index}`;
-                input.value = String.fromCharCode(65 + i);
-                label.appendChild(input);
-                label.appendChild(document.createTextNode(`${input.value}. ${choice}`));
-                li.appendChild(label);
-                ul.appendChild(li);
+            questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="question-${index}"]:checked`);
+                const answer = selected ? selected.value : null; 
+                answers.push(answer);
+                if (answer === q.a) score++;
             });
 
-            container.appendChild(ul);
-            quizForm.appendChild(container);
-        });
-    }
-    
-    async function initialize() {
-        try {
-            const { data: { user }, error } = await supabase.auth.getUser();
-            if (user) {
-                currentUser = user;
-            }
-        } catch (e) {
-            console.warn("Could not retrieve current user. Running as anonymous.", e);
-        }
+            const totalQuestions = questions.length;
+            const percentage = Math.round((score / totalQuestions) * 100);
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || currentUser?.email || "anonymous@example.com";
+            const userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || "ไม่ระบุ";
 
-        renderQuiz();
-    }
+            try {
+                const { error } = await supabase
+                    .from('quiz_results')
+                    .insert([{
+                        user_email: userEmail,
+                        name: userNameVal,
+                        score: score,
+                        total_questions: totalQuestions,
+                        answers: answers,
+                        experience: userExperience,
+                        quiz_set: quizHeader
+                    }]);
 
-    initialize();
+                if (error) throw error; 
 
-    // --- Event Listener: Submit Button ---
-    submitBtn.addEventListener('click', async () => {
-        submitBtn.disabled = true;
+                if (percentage >= 80) {
+                    resultDiv.innerHTML = `🎉 ยินดีด้วย! คุณสอบผ่าน (${percentage}%) ได้คะแนน ${score} จาก ${totalQuestions} ข้อ`;
+                    resultDiv.style.backgroundColor = '#d1ffd1';
+                    resultDiv.style.color = '#005900';
+                    
+                    certName.textContent = userNameVal;
+                    certCourseName.textContent = quizHeader.replace('แบบทดสอบปรนัย: ', '').replace(/\s*\(.*\)/, '');
+                    
+                    certificateWrapper.style.display = 'block';
+                    quizForm.style.display = 'none';
+                    submitBtn.style.display = 'none';
+                } else {
+                    resultDiv.innerHTML = `❌ คุณได้คะแนน ${score} จาก ${totalQuestions} ข้อ (${percentage}%) ยังไม่ผ่านเกณฑ์ (ต้องได้ 80% ขึ้นไป)`;
+                    resultDiv.style.backgroundColor = '#ffd1d1';
+                    resultDiv.style.color = '#900';
+                    submitBtn.style.display = 'none';
 
-        let score = 0;
-        const answers = [];
-
-        // 1. คำนวณคะแนนและรวบรวมคำตอบ
-        questions.forEach((q, index) => {
-            const selected = document.querySelector(`input[name="question-${index}"]:checked`);
-            const answer = selected ? selected.value : null; 
-            answers.push(answer);
-            if (answer === q.a) score++;
-        });
-
-        const totalQuestions = questions.length;
-        
-        // 🔥 ดึงข้อมูล Email, Name และ Experience จาก URL Params หรือ sessionStorage
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        const userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || currentUser?.email || "anonymous@example.com";
-        const userName = document.getElementById('name').value.trim() || urlParams.get('name') || sessionStorage.getItem('user_name') || "ไม่ระบุชื่อ";
-        
-        // 🔥 ดึงค่าประสบการณ์ (Experience)
-        const userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || "ไม่ระบุ";
-
-        // 2. บันทึกผลลัพธ์โดยใช้ Supabase Client (แนบ experience ไปด้วย)
-        const { error } = await supabase
-            .from('quiz_results')
-            .insert([
-                {
-                    user_email: userEmail,
-                    name: userName,
-                    score: score,
-                    total_questions: totalQuestions,
-                    answers: answers,
-                    experience: userExperience // 🔥 บันทึกค่าประสบการณ์ลง Supabase ที่นี่!
+                    const retryBtn = document.createElement('button');
+                    retryBtn.textContent = 'ทำแบบทดสอบใหม่อีกครั้ง';
+                    retryBtn.style.backgroundColor = '#dc3545';
+                    retryBtn.onclick = () => location.reload();
+                    actionContainer.innerHTML = ''; 
+                    actionContainer.appendChild(retryBtn);
                 }
-            ]);
 
-        // 3. จัดการผลลัพธ์และการแสดงผล
-        if (error) {
-            console.error('Error saving quiz result:', error.message);
-            resultDiv.textContent = `เกิดข้อผิดพลาดในการบันทึกผล (รหัส: ${error.code}) กรุณาลองใหม่`;
-            resultDiv.style.backgroundColor = '#ffd1d1';
-            resultDiv.style.color = '#900';
-            submitBtn.disabled = false;
-        } else {
-            console.log("Quiz result saved successfully.");
-            resultDiv.textContent = `บันทึกผลสำเร็จ! คุณได้คะแนน ${score} จาก ${totalQuestions} ข้อ`;
-            resultDiv.style.backgroundColor = '#d1ffd1';
-            resultDiv.style.color = '#005900';
-        }
+                resultDiv.style.display = 'block';
 
-        resultDiv.style.display = 'block';
-    });
-</script>
+            } catch (err) {
+                console.error('Error saving quiz result:', err.message || err);
+                resultDiv.textContent = `เกิดข้อผิดพลาดในการบันทึกผล (ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต) กรุณาลองใหม่`;
+                resultDiv.style.backgroundColor = '#ffd1d1';
+                resultDiv.style.color = '#900';
+                resultDiv.style.display = 'block';
+                
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'ส่งคำตอบ';
+            }
+        });
+
+        downloadCertBtn.addEventListener('click', () => {
+            window.print();
+        });
+    </script>
 </body>
 </html>
