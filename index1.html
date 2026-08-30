@@ -158,14 +158,16 @@
                 padding: 20px 0; /* เพิ่มพื้นที่ด้านบนนิดหน่อยให้ดูสวยงาม */
             }
             
-            #certificate {
-                display: inline-block !important; /* ให้ทำงานร่วมกับ text-align: center */
-                position: relative !important;
-                width: 95% !important;
-                max-width: 1000px !important;
-                margin: 0 auto !important;
+#certificate {
+                visibility: visible;
+                position: absolute !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                width: 90% !important;
+                max-width: 950px !important;
                 box-shadow: none !important;
-                page-break-inside: avoid;
+                margin: 0 !important;
             }
             
             /* 4. ปรับหน้ากระดาษ และตั้ง margin: 0 เพื่อซ่อนวันที่/URL ของเบราว์เซอร์ */
