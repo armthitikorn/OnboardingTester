@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>แบบทดสอบ</title>
+    <title>แบบทดสอบ: PRU Healthy Plus</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* โค้ด CSS สไตล์เดิม */
         body {
             font-family: 'Sarabun', sans-serif;
             max-width: 900px;
@@ -31,6 +30,7 @@
             color: #0059b3;
             margin-bottom: 10px;
             font-size: 1.1rem;
+            line-height: 1.5;
         }
         .choices {
             list-style: none;
@@ -90,24 +90,135 @@
         .hidden {
             display: none;
         }
+        
+        /* สไตล์สำหรับใบประกาศนียบัตรจำลอง */
+        #certificate-wrapper {
+            display: none;
+            text-align: center;
+            margin-top: 40px;
+        }
+        #certificate {
+            background: #fff;
+            border: 15px solid #004080;
+            padding: 15px;
+            text-align: center;
+            border-radius: 4px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .cert-inner {
+            border: 2px solid #d4af37;
+            padding: 50px 30px;
+            background-color: #faf9f5;
+        }
+        .cert-title {
+            color: #d4af37; 
+            font-family: 'Georgia', serif; 
+            font-size: 2.5rem; 
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .cert-name {
+            color: #004080; 
+            font-size: 2rem;
+            border-bottom: 2px solid #004080; 
+            display: inline-block; 
+            padding: 0 40px 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 0mm !important; 
+            }
+            
+            body > *:not(#certificate-wrapper) {
+                display: none !important;
+            }
+
+            #certificate-wrapper {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: white !important;
+            }
+
+            #certificate {
+                display: block !important;
+                width: 90% !important;
+                max-width: 260mm !important; 
+                margin: auto !important;
+                position: static !important;
+                transform: none !important;
+                box-shadow: none !important;
+                page-break-inside: avoid !important;
+            }
+
+            #certificate-wrapper button, 
+            #certificate-wrapper a {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <h2>แบบทดสอบปรนัย: PRU Healthy Plus (25 ข้อ)</h2>
+    <h2 id="quizHeader">แบบทดสอบปรนัย: PRU Healthy Plus (50 ข้อ)</h2>
 
     <div id="loading" class="loading-text">กำลังโหลดแบบทดสอบ...</div>
 
-    <div style="margin-bottom: 20px;"><label for="name">ชื่อผู้ทำแบบทดสอบ:</label><input type="text" id="name" name="name" required style="width:100%;padding:10px;margin-top:5px;"></div>
-<form id="quizForm" class="hidden"></form>
+    <div style="margin-bottom: 20px;">
+        <label for="name">ชื่อผู้ทำแบบทดสอบ:</label>
+        <input type="text" id="name" name="name" required style="width:100%;padding:10px;margin-top:5px;" placeholder="กรุณากรอกชื่อ-นามสกุล">
+    </div>
+    
+    <form id="quizForm" class="hidden"></form>
 
     <button id="submitBtn" class="hidden">ส่งคำตอบ</button>
 
     <div id="result"></div>
-    
-    <a href="index5.html">
-        <button style="margin-top: 20px;">ไปหน้าถัดไป</button>
-    </a>
+    <div id="actionContainer" style="text-align: center; margin-top: 20px;"></div>
+
+    <!-- ส่วนแสดงใบประกาศนียบัตร -->
+    <div id="certificate-wrapper">
+        <div id="certificate">
+            <div class="cert-inner">
+                <h1 class="cert-title">Certificate of Achievement</h1>
+                <p style="font-size: 1.2rem; color: #555; margin-top: 20px;">ขอมอบประกาศนียบัตรฉบับนี้เพื่อให้เกียรติว่า</p>
+                <h2 id="certName" class="cert-name">-</h2>
+                <p style="font-size: 1.2rem; color: #555; margin-top: 10px;">
+                    ได้ผ่านการทดสอบหลักสูตร <br> 
+                    <strong id="certCourseName" style="color: #333; font-size: 1.5rem;">-</strong> <br> 
+                    ด้วยคะแนนที่ผ่านเกณฑ์มาตรฐานอย่างสมบูรณ์
+                </p>
+                <div style="margin-top: 50px; text-align: center;">
+                    <div style="display: inline-block; width: 200px; border-top: 1px solid #333; padding-top: 10px; margin: 0 20px;">
+                        <p style="margin: 0; font-size: 0.9rem;">Prudential Life Assurance</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button id="downloadCertBtn" style="background-color: #28a745; max-width: 250px; margin: 30px auto;">
+            📥 ดาวน์โหลดใบประกาศ
+        </button>
+        <!-- ลิงก์สำหรับไปจุดเริ่มต้น -->
+        <a href="index.html" id="nextPageLink" style="text-decoration: none;">
+            <button style="margin-top: 10px; background-color: #007acc; max-width: 250px; margin: 10px auto;">ออก (ชุดที่)</button>
+        </a>
+    </div>
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -119,178 +230,211 @@
 
         let currentUser = null;
 
-        // ข้อมูลคำถาม (ใช้ข้อมูลเดิมทั้งหมด)
-const questions = [
-    { q: "2. PRU Healthy Plus คุ้มครองกี่ปี?", a: "C", choices: ["คุ้มครอง 80 ปี", "คุ้มครอง 60 ปี", "คุ้มครองถึงอายุ 80 ปี", "ถูกทุกข้อ"] },
-    { q: "3. PRU Healthy Plus ชำระเบี้ยกี่ปี?", a: "C", choices: ["60 ปี", "80 ปี", "ถึงอายุ 60 ปี", "ถึงอายุ 80 ปี"] },
-    { q: "4. PRU Healthy Plus ผู้สมัครต้องมีอายุเท่าใด?", a: "C", choices: ["20-60", "20-55", "20-50", "20-65"] },
-    { q: "5. PRU Healthy Plus มีความคุ้มครองอะไรบ้าง?", a: "B", choices: ["ชีวิตและสะสมทรัพท์", "ชีวิตสะสมทรัพย์และชดเชยรายได้", "อุบัติเหตุชดเชยรายได้", "ถูกทุกข้อ"] },
-    { q: "6. PRU Healthy Plus มีทุนสูงสุดเท่าใด?", a: "B", choices: ["100,000", "1,000,000", "500,000", "3,000,000"] },
-    { q: "7. PRU Healthy Plus ให้ความคุ้มครองชีวิตอย่างไร?", a: "A", choices: ["จ่ายทุน 100% หากเสียชีวิต", "จ่ายทุน 100% หากมีอายุครบ 80 ปี", "จ่ายทุน 100% หากเจ็บป่วยไม่สบาย", "ข้อ ก และ ข ถูก"] },
-    { q: "8. PRU Healthy Plus การันตีเงินคืนครั้งแรกเมื่อใด?", a: "B", choices: ["เมื่อครบอายุ 70 ปี", "เมื่อครบอายุ 60 ปี", "เมื่อครบอายุ 80 ปี", "เมื่อหยุดชำระเบี้ย"] },
-    { q: "9. PRU Healthy Plus การันตีเงินคืนครั้งแรกกี่%?", a: "D", choices: ["30%", "80%", "50%", "20%"] },
-    { q: "10. จากข้อ 9 หากทำประกัน PRU Healthy Plus แผน 9 ลูกค้าจะได้รับเงินเท่าใด?", a: "D", choices: ["300,000", "800,000", "500,000", "200,000"] },
-    { q: "11. PRU Healthy Plus การันตีเงินคืนครั้งที่สุดท้ายกี่%?", a: "B", choices: ["30%", "80%", "50%", "20%"] },
-    { q: "12. จากข้อ 11 หากทำประกัน PRU Healthy Plus แผน 9 ลูกค้าจะได้รับเงินเท่าใด?", a: "B", choices: ["300,000", "800,000", "500,000", "200,000"] },
-    { q: "13. PRU Healthy Plus มีเงินชดเชยรายได้สูงสุดเท่าได?", a: "A", choices: ["1,000,000", "3,000,000", "500,000", "ไม่มีข้อใดถูก"] },
-    { q: "14. PRU Healthy Plus มีเกณฑ์การจ่ายเงินชดเชยรายได้อย่างไร?", a: "A", choices: ["นอนรักษาตัวใน รพ.เกิน 6 ชั่วโมง", "ต้องผ่าตัดใหญ่เท่านั้น", "ต้องเกิดจากการเจ็บป่วยเท่านั้น", "เป็นผู้ป่วยนอกได้ทุกกรณี"] },
-    { q: "15. ลูกค้า PRU Healthy Plus นอน รพ.จากการผ่าตัดใหญ่ห้องผู้ป่วยทั่วไปจะได้รับเงินค่าชดเชยส่วนใดบ้าง?", a: "A", choices: ["ค่าชดเชยรายได้รายวัน+ค่าเชยเชยผ่าตัดใหญ่+ค่าชดเชยค่ายารักษาโรค", "ค่ารักษาพยาบาล+ค่าผ่าตัด+ค่าชดเชยผ่าตัด", "ค่าชดเชยรายได้รายวันICU+ค่าเชยเชยผ่าตัดใหญ่+ค่าชดเชยค่ายารักษาโรค", "ได้ทุกรณีที่เข้า รพ."] },
-    { q: "16. จากข้อ15หากลูกค้าทำแผน 9 ไว้และนอนรักษาตัวผู้ป่วยในทั่วไป10วันจะได้รับเงินชดเชยเท่าใด?", a: "A", choices: ["42,000", "53,000", "34,000", "25,000"] },
-    { q: "17. จากข้อ15หากลูกค้าทำแผน 3 ไว้และนอนรักษาตัวผู้ป่วยในทั่วไป10วันจะได้รับเงินชดเชยเท่าใด?", a: "B", choices: ["32,000", "21,000", "41,000", "11,000"] },
-    { q: "18. ลูกค้า PRU Healthy Plus ได้ผ่าตัดใส้ติ่งโดยการส่องกล้องหลังผ่าตัดหมอให้กลับบ้านได้จะได้รับเงินค่าชดเชยส่วนใดบ้าง?", a: "A", choices: ["ค่าชดเชยรายได้รายวัน+ค่าเชยเชยผ่าตัดใหญ่+ค่าชดเชยค่ายารักษาโรค", "ค่ารักษาพยาบาล+ค่าผ่าตัด+ค่าชดเชยผ่าตัด", "ค่าชดเชยรายได้รายวันICU+ค่าเชยเชยผ่าตัดใหญ่+ค่าชดเชยค่ายารักษาโรค", "ได้ทุกรณีที่เข้า รพ."] },
-    { q: "19. ลูกค้า PRU Healthy Plus ได้ผ่าตัดนิ้วล็อคเสร็จแล้วรับยากลับบ้านจะได้เงินค่าชดเชยส่วนใดบ้าง?", a: "D", choices: ["ค่าชดเชยรายได้รายวัน+ค่าเชยเชยผ่าตัดใหญ่+ค่าชดเชยค่ายารักษาโรค", "ค่ารักษาพยาบาล+ค่าผ่าตัด+ค่าชดเชยผ่าตัด", "ค่าเชยเชยผ่าตัดเล็ก+ค่าชดเชยค่ายารักษาโรค", "ค่าเชดเชยผ่าตัดหัถการผู้ป่วยนอก"] },
-    { q: "20. ลูกค้า PRU Healthy Plus หากเบิกเคลมเงินชดเชยรายได้ยังไม่ครบตามทุนที่เลือกไว้หากอายุ 70 ปีจะสามารถเบิกเงินชดเชยได้อีกหรือไม่?", a: "A", choices: ["ได้เพราะคุ้มครองให้ถึงอายุ 80 ปี", "ไม่ได้เพราะอายุเกิน 60ปี", "ไม่ได้เพราะคุ้มครองถึงอายุ60ปี", "ได้หากยังชำระเบี้ยอยู่"] },
-    { q: "21. PRU Healthy Plus มีระยะรอคอยหรือไม่?", a: "C", choices: ["ไม่มีเพราะเป็นประกันสะสมทรัพย์", "ไม่มีเพราะเป็นประกันชีวิต", "มีระยะรอคอย 30 วันและ 120 / 8 โรค เพราะมีสัญญาแนบท้ายสุขภาพชดเชยรายได้", "มีเพราะเป็นประกันสุขภาพ"] },
-    { q: "22. ลูกค้าปวดฟันไปหาหมอหมอแจ้งว่าต้องผ่าตัด เคสแบบนี้จะสามารถเบิกเคลมได้หรือไม่?", a: "A", choices: ["ไม่ได้เพราะอาการที่เกี่ยวกับเหงือกหรือฟันอยู่ในเงื่อนไขข้อยกเว้น", "ได้เพราะมีการผ่าตัด", "ได้เพราะถือว่าเป็นการผ่าตัดเล็ก", "ได้ทั้งค่าผ่าตัดและค่ายา"] },
-    { q: "23. ลูกค้าประสบอุบัติเหตุรถจักยานยนต์ล้มทำให้ฟันหักหมอต้องทำการผ่าตัดตกแต่งบาดแผลเคสนี้สามารถเบิกเคลมได้หรือไม่?", a: "A", choices: ["เบิกเคลมผ่าตัดเล็กได้เพราะเกิดจากอุบัติเหตุ", "ไม่สามารถเบิกเคลมได้ถ้าเกี่ยวกับฟัน", "อุบัติเหตุไม่อยู่ในเงื่อนไขความคุ้มครอง", "ข้อ ข.และ ค.ถูก"] },
-    { q: "24. ลูกค้าตั้งครรฑ์ได้ 3 เดือน สามารถสมัครโครงการ PRU Healthy Plus ได้หรือไม่?", a: "C", choices: ["ได้เพราะไม่มีข้อยกเว้น", "ได้เพราะไม่ได้คุ้มครองการตั้งครรฑ์อยู่แล้ว", "ไม่ได้เพราะติดเงื่อไขข้อยกเว้น", "ถูกทั้งข้อ ก. และ ข."] },
-    { q: "25. นาย เฉย ได้ดื่มสุรากับ นาย ชา จนเมามาย ขากลับนายเฉย ขับรถชนต้นไม้ได้รับบาดเจ็บต้องเข้ารักษาตัวใน รพ. นายเฉยสามารถเบิกเคลมได้หรือไม่?", a: "A", choices: ["ไม่ได้เพราะเกิดเหตุในขณะมึนเมา", "ไม่ได้เพราะเป็นข้อยกเว้นของสัญญาสุขภาพและอุบัติเหตุ", "ไม่ได้เพราะเป็นคนขับชนต้นไม้เอง", "ถูกทุกข้อ"] },
-    { q: "26. ในการเบิกเคลม โครงการ PRU Healthy Plus ต้องใช้เอกสารอะไรบ้าง?", a: "D", choices: ["หนังสือเรียกร้องค่าสินไหมทดแทน", "รายงานของแพทย์หรือของสถานพยาบาล", "สำเนาบัตรประชาชนของผู้เอาประกันภัยสำเนาใบเสร็จรับเงิน หรือ ใบสรุปหน้างบการเงิน", "ถูกทุกข้อ"] },
-    { q: "27. ในการเบิกเคลมเงินชดเชยรายได้จาก โครงการ PRU Healthy Plus ต้องทำอย่างไร?", a: "D", choices: ["สามารถเคลมผ่าน PRU Connect (E-Claims)ได้", "ส่งเอกสารมาที่บริษัทPRUDENTAIL", "มาด้วยตัวเองที่ สนง.ใหญ่ชั้น 30", "ถูกทุกข้อ"] },
-    { q: "28. ลูกค้าจะได้รับเงินหลังจากยื่นเอกสารเบิกเคลมครบถ้วนภายในกี่วัน?", a: "D", choices: ["ไม่เกิน15วันทำการ", "ประมาณ 14 วันทำการ", "ภายใน 14 วันทำการ", "ภายใน 15 วันทำการ"] },
-    { q: "29. ส่วนใหญ่ลูกค้าจะได้รับเงินค่าสินไหมในรูปแบบใด?", a: "A", choices: ["โอนเข้าบัญชี", "เช็คเงินสด", "รับเป็นเงินสด", "ถูกทุกข้อ"] },
-    { q: "30. หัตถการทางการแพทย์ หมายถึงอะไร?", a: "D", choices: ["การรักษาผู้ป่วยโดยมีการใช้เครื่องมือและอุปกรณ์ต่าง ๆ เข้าสู่ร่างกายผู้ป่วย", "การใช้เข็มเจาะน้ำจากช่องปอด การใส่สายสวนหัวใจ การฉีดยาเข้าในข้อ การผ่าตัดต่าง ๆ การเย็บบาดแผล", "การเจาะเลือด การทำแผล การให้น้ำเกลือ และเป็นการทำการรักษาโดยแพทย์แผนปัจจุบัน", "ถูกทุกข้อ"] },
-    { q: "31. โรคในข้อใดมีระยะรอคอย 120 วัน?", a: "B", choices: ["เนื้องอก ถุงน้ำ หรือมะเร็งทุกชนิด,ริดสีดวงจมูก, เส้นเลือดขอดที่แขน", "ไส้เลื่อนทุกชนิด, ต้อเนื้อ หรือต้อกระจก,เยื่อบุโพรงมดลูกเจริญผิดที่", "เนื้องอกถุงน้ำ หรือมะเส็งทุกชนิด,ริดสีดวงทวาร,การตัดทอนซิล หรืออดีนอยด์", "ถูกทุกข้อ"] },
-    { q: "32. หากเบิกเคลม เงินชดเชยเต็มทุนไปแล้ว ค่าเบี้ยที่ต้องชำระจะลดลงหรือไม่?", a: "A", choices: ["ยังคงจ่ายเบี้ยคงที่เท่าเดิม", "ปรับลดลงเพราะไม่ต้องจ่ายเงินชดเชยแล้ว", "ต้องแจ้งขอลดไปที่บริษัท", "ไม่ต้องชำระเบี้ยทั้งสองสัญญา"] },
-    { q: "33. เมื่ออายุครบ 60 ปี ทางโครงการจะจ่ายเงินการันตี ให้ 20% หากฝากไว้กับบริษัทจะได้รับดอกเบี้ยเพิ่มหรือไม่?", a: "C", choices: ["ได้ 2%", "ได้ 4%", "ฝากได้แต่ไม่ได้ดอกเบี้ย", "บริษัทไม่รับฝาก"] },
-    { q: "34. กรณีถูกสุนัขกัดแล้วต้องมีการฉีดวัคซีนสามารถเบิกเคลมค่ารักษาได้เท่าไหร่?", a: "A", choices: ["เบิกไม่ได้", "เบิกได้ตามจริงไม่เกินทุนที่เลือก", "เบิกได้เฉพาะค่าชดเชยค่ารักษา", "ไม่มีข้อถูก"] },
-    { q: "35. หลังจากได้รับ 20% ไปแล้วหากเสียชีวิตจะได้ทุน 80% ใช่หรือไม่?", a: "A", choices: ["ไม่ใช่ต้องได้เงินชดเชย 100%", "ไม่ใช่ต้องได้เบี้ยคืน 100%", "ไม่ได้เพราะเสียชีวิตแล้ว", "ไม่ใช่เพราะต้องได้รับทุน 100%"] },
-    { q: "36. หลังจากได้รับทุน 100% ไปแล้วยังได้รับความคุ้มครองต่อหรือไม่?", a: "A", choices: ["ได้คุ้มครองปกติ", "ได้แต่ต้องชำระเบี้ยต่อ", "ได้อีก 80%", "ไม่มีข้อได้ถูก"] },
-    { q: "37. หากลูกค้ามีการเบิกเคลมเงินชดเชยนอน รพ.จากอุบัติเหตุหลังจากกรมธรรม์มีผลบังคับได้เพียง 10 วันได้หรือไม่?", a: "C", choices: ["ไม่ได้ ติดระยะรอคอย 30 วัน", "ไม่ได้ เพราะเกิดจากอุบัติเหตุ", "ได้เพราะเกิดจากอุบัติเหตุ", "ไม่ถูกทุกข้อ"] },
-    { q: "38. จากข้อ 37 ลูกค้าสามารถยกเลิก Free Look ได้หรือไม่?", a: "B", choices: ["ได้ตามปกติ", "ไม่ได้เพราะมีการเบิกเคลมไปแล้ว", "ได้ตามกฏหมาย", "ได้เพราะ คปภ.ไม่ได้ห้ามไว้"] },
-    { q: "39. โครงการ PRU Healthy Plus สามารถกู้ยืมเงินจากบริษัทโดยใช้กรมธรรม์เป็นประกันได้หรือไม่?", a: "A", choices: ["ได้", "ไม่ได้", "ไม่แน่ใจ", "ถูกทุกข้อ"] },
-    { q: "40. จากข้อที่39 หากกู้ได้เราควรแนะนำให้ลูกค้าว่าอย่างไร?", a: "A", choices: ["กู้ได้ตามมูลค่ากรมธรรม์และการกู้จะมีดอกเบี้ยที่ลูกค้าต้องชำระพร้อมเงินต้นหากไม่ชำระคืนอาจทำให้กรมธรรม์ขาดได้", "กู้ได้ตั้งแต่ปีที่1ไม่มีดอกเบี้ยมีแต่ค่าธรรมเนียมเล็กน้อยเท่านั้น", "จะกู้ตอนไหนก็ได้จะจ่ายยังไงก็ได้ตามที่ลูกค้าสะดวก", "ไม่แนะนำเพราะการกู้เงินต้องเสียดอกเบี้ยที่สูง"] },
-    { q: "41. ลูกค้าจะได้รับกรมธรรม์ภายในกี่วัน", a: "A", choices: ["15 วัน", "30 วัน", "5 วัน", "เมื่อไปรษณีย์ไปส่งให้"] },
-    { q: "42. หากลูกค้าต้องการยกเลิกหลังอายุ 60 ปีไปแล้วเราจะแนะนนำลูกค้าว่าอย่างไร?", a: "B", choices: ["สามารถยกเลิกได้ตามความต้องการของลูกค้าโดยไม่ขาดทุน", "หลังปีที่อายุครบ 60 ลูกค้าไม่ต้องชำระเบี้ยแล้วแต่ยังคงได้รับความคุ้มครองหากยกเลิกอาจทำให้เสียประโยชน์หลายอย่างได้", "หากยกเลิกจะไม่ได้อะไรคืนเลยไม่แนะนำ", "ให้โทรแจ้งที่ 1621"] },
-    { q: "43. จุดคุ้มทุนของโครงการ PRU Healthy Plus อยู่ที่ปีไหน?", a: "D", choices: ["ปีที่อายุครบ 60", "ปีที่อายุครบ 79", "ปีที่ลูกค้าอายุครบ 80", "ไม่มีข้อไดถูก"] },
-    { q: "44. คำว่า ผ่าตัดเล็ก หมายถึง?", a: "A", choices: ["การผ่าตัดได้เยื้อบุผิวหนังที่ใช้ยาระงับความรู้สึกเฉพาะส่วน ใช้เวลาไม่นาน", "การใช้อุปกรณ์ทางการแพทย์ในการดูดขุดเจาะส่อง", "ถูกทั้ง ก และ ข", "ไม่มีข้อถูก"] },
-    { q: "45. รู้สึกอ่อนเพลีย ก็เลยไป รพ.ขอหมอให้น้ำเกลือ 3 กระปุกนอนให้น้ำเกลือไป เกิน 6 ชั่วโมง สามารถเบิกเงินชดเชยได้หรือไม่?", a: "C", choices: ["หากเกิน 6 ชั่วโมงเบิกได้", "เบิกได้ตามเงื่อนไขนอนรพ.", "เบิกไม่ได้ไม่ได้เป็นความจำเป็นทางการแพทย์", "ไม่มีข้อถูก"] },
-    { q: "46. ก.มีอาการเจ็บฝ่าเท้าจึงไปหาหมอที่ รพ.หมอวินิจฉัยว่าเป็น ตาปลาต้องได้รับการผ่าตัดเอาออกเคสนี้จะเบิกเคลมส่วนใดได้บ้าง", a: "B", choices: ["เบิกค่าชดเชยนอน รพ.และเงินชดเชยผ่าตัดใหญ่พร้อมทั้งค่ายา", "เคลมได้ในส่วนเงินชดเชยค่าผ่าตัดเล็ก", "เคลม Day Case ได้", "เคลมไม่ได้"] },
-    { q: "47. ผ่าตัดส่งกล้องเคลมเงินชดเชยได้กี่วัน?", a: "A", choices: ["1 วัน", "ตามจำนวนที่นอน", "ไม่ได้นอนเคลมไม่ได้", "ขึ้นอยู่กับใบรับรองแพทย์"] },
-    { q: "48. จากข้อที่ 47 สามารถเบิกค่าชดเชยอะไรได้อีกบ้าง?", a: "A", choices: ["เชยเชยผ่าตัดใหญ่และค่าชดเชยค่ายา", "ค่าชดเชยผ่าตัดเล็ก", "ชดเชยค่ารักษา", "ชดเชยค่ายา"] },
-    { q: "49. หากได้รับค่าชดเชยลูกค้าสามารถฝากกับบริษัทได้หรือไม่", a: "A", choices: ["ไม่ได้", "ได้", "ไม่แน่ใจ", "ไม่มีข้อถูก"] },
-    { q: "50. ประกัน PRU Healthy Plus เรียกอีกอย่างหนึ่งว่า?", a: "A", choices: ["ประกันสะสมทรัพย์ 80/20", "ประกันชดเชยรายได้", "ประกันสะสมทรัพย์เพิ่มค่า80/20", "ประกันบำนาญ"] }
-];
- // --- DOM Elements ---
-    const quizForm = document.getElementById('quizForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const loading = document.getElementById('loading');
-    const resultDiv = document.getElementById('result');
+        // ข้อมูลคำถาม ชุดที่ 5
+        const questions = [
+            { q: "2. PRU Healthy Plus คุ้มครองกี่ปี?", a: "C", choices: ["คุ้มครอง 80 ปี", "คุ้มครอง 60 ปี", "คุ้มครองถึงอายุ 80 ปี", "ถูกทุกข้อ"] },
+            { q: "3. PRU Healthy Plus ชำระเบี้ยกี่ปี?", a: "C", choices: ["60 ปี", "80 ปี", "ถึงอายุ 60 ปี", "ถึงอายุ 80 ปี"] },
+            { q: "4. PRU Healthy Plus ผู้สมัครต้องมีอายุเท่าใด?", a: "C", choices: ["20-60", "20-55", "20-50", "20-65"] },
+            { q: "5. PRU Healthy Plus มีความคุ้มครองอะไรบ้าง?", a: "B", choices: ["ชีวิตและสะสมทรัพท์", "ชีวิตสะสมทรัพย์และชดเชยรายได้", "อุบัติเหตุชดเชยรายได้", "ถูกทุกข้อ"] },
+            { q: "6. PRU Healthy Plus มีทุนสูงสุดเท่าใด?", a: "B", choices: ["100,000", "1,000,000", "500,000", "3,000,000"] },
+            { q: "7. PRU Healthy Plus ให้ความคุ้มครองชีวิตอย่างไร?", a: "A", choices: ["จ่ายทุน 100% หากเสียชีวิต", "จ่ายทุน 100% หากมีอายุครบ 80 ปี", "จ่ายทุน 100% หากเจ็บป่วยไม่สบาย", "ข้อ ก และ ข ถูก"] },
+            { q: "8. PRU Healthy Plus การันตีเงินคืนครั้งแรกเมื่อใด?", a: "B", choices: ["เมื่อครบอายุ 70 ปี", "เมื่อครบอายุ 60 ปี", "เมื่อครบอายุ 80 ปี", "เมื่อหยุดชำระเบี้ย"] },
+            { q: "9. PRU Healthy Plus การันตีเงินคืนครั้งแรกกี่%?", a: "D", choices: ["30%", "80%", "50%", "20%"] },
+            { q: "10. จากข้อ 9 หากทำประกัน PRU Healthy Plus แผน 9 ลูกค้าจะได้รับเงินเท่าใด?", a: "D", choices: ["300,000", "800,000", "500,000", "200,000"] },
+            { q: "11. PRU Healthy Plus การันตีเงินคืนครั้งที่สุดท้ายกี่%?", a: "B", choices: ["30%", "80%", "50%", "20%"] },
+            { q: "12. จากข้อ 11 หากทำประกัน PRU Healthy Plus แผน 9 ลูกค้าจะได้รับเงินเท่าใด?", a: "B", choices: ["300,000", "800,000", "500,000", "200,000"] },
+            { q: "13. PRU Healthy Plus มีเงินชดเชยรายได้สูงสุดเท่าได?", a: "A", choices: ["1,000,000", "3,000,000", "500,000", "ไม่มีข้อใดถูก"] },
+            { q: "14. PRU Healthy Plus มีเกณฑ์การจ่ายเงินชดเชยรายได้อย่างไร?", a: "A", choices: ["นอนรักษาตัวใน รพ.เกิน 6 ชั่วโมง", "ต้องผ่าตัดใหญ่เท่านั้น", "ต้องเกิดจากการเจ็บป่วยเท่านั้น", "เป็นผู้ป่วยนอกได้ทุกกรณี"] },
+            { q: "15. ลูกค้า PRU Healthy Plus นอน รพ.จากการผ่าตัดใหญ่ห้องผู้ป่วยทั่วไปจะได้รับเงินค่าชดเชยส่วนใดบ้าง?", a: "A", choices: ["ค่าชดเชยรายได้รายวัน+ค่าเชยเชยผ่าตัดใหญ่+ค่าชดเชยค่ายารักษาโรค", "ค่ารักษาพยาบาล+ค่าผ่าตัด+ค่าชดเชยผ่าตัด", "ค่าชดเชยรายได้รายวันICU+ค่าเชยเชยผ่าตัดใหญ่+ค่าชดเชยค่ายารักษาโรค", "ได้ทุกรณีที่เข้า รพ."] },
+            { q: "16. จากข้อ15หากลูกค้าทำแผน 9 ไว้และนอนรักษาตัวผู้ป่วยในทั่วไป10วันจะได้รับเงินชดเชยเท่าใด?", a: "A", choices: ["42,000", "53,000", "34,000", "25,000"] },
+            { q: "17. จากข้อ15หากลูกค้าทำแผน 3 ไว้และนอนรักษาตัวผู้ป่วยในทั่วไป10วันจะได้รับเงินชดเชยเท่าใด?", a: "B", choices: ["32,000", "21,000", "41,000", "11,000"] },
+            { q: "18. ลูกค้า PRU Healthy Plus ได้ผ่าตัดใส้ติ่งโดยการส่องกล้องหลังผ่าตัดหมอให้กลับบ้านได้จะได้รับเงินค่าชดเชยส่วนใดบ้าง?", a: "A", choices: ["ค่าชดเชยรายได้รายวัน+ค่าเชยเชยผ่าตัดใหญ่+ค่าชดเชยค่ายารักษาโรค", "ค่ารักษาพยาบาล+ค่าผ่าตัด+ค่าชดเชยผ่าตัด", "ค่าชดเชยรายได้รายวันICU+ค่าเชยเชยผ่าตัดใหญ่+ค่าชดเชยค่ายารักษาโรค", "ได้ทุกรณีที่เข้า รพ."] },
+            { q: "19. ลูกค้า PRU Healthy Plus ได้ผ่าตัดนิ้วล็อคเสร็จแล้วรับยากลับบ้านจะได้เงินค่าชดเชยส่วนใดบ้าง?", a: "D", choices: ["ค่าชดเชยรายได้รายวัน+ค่าเชยเชยผ่าตัดใหญ่+ค่าชดเชยค่ายารักษาโรค", "ค่ารักษาพยาบาล+ค่าผ่าตัด+ค่าชดเชยผ่าตัด", "ค่าเชยเชยผ่าตัดเล็ก+ค่าชดเชยค่ายารักษาโรค", "ค่าเชดเชยผ่าตัดหัถการผู้ป่วยนอก"] },
+            { q: "20. ลูกค้า PRU Healthy Plus หากเบิกเคลมเงินชดเชยรายได้ยังไม่ครบตามทุนที่เลือกไว้หากอายุ 70 ปีจะสามารถเบิกเงินชดเชยได้อีกหรือไม่?", a: "A", choices: ["ได้เพราะคุ้มครองให้ถึงอายุ 80 ปี", "ไม่ได้เพราะอายุเกิน 60ปี", "ไม่ได้เพราะคุ้มครองถึงอายุ60ปี", "ได้หากยังชำระเบี้ยอยู่"] },
+            { q: "21. PRU Healthy Plus มีระยะรอคอยหรือไม่?", a: "C", choices: ["ไม่มีเพราะเป็นประกันสะสมทรัพย์", "ไม่มีเพราะเป็นประกันชีวิต", "มีระยะรอคอย 30 วันและ 120 / 8 โรค เพราะมีสัญญาแนบท้ายสุขภาพชดเชยรายได้", "มีเพราะเป็นประกันสุขภาพ"] },
+            { q: "22. ลูกค้าปวดฟันไปหาหมอหมอแจ้งว่าต้องผ่าตัด เคสแบบนี้จะสามารถเบิกเคลมได้หรือไม่?", a: "A", choices: ["ไม่ได้เพราะอาการที่เกี่ยวกับเหงือกหรือฟันอยู่ในเงื่อนไขข้อยกเว้น", "ได้เพราะมีการผ่าตัด", "ได้เพราะถือว่าเป็นการผ่าตัดเล็ก", "ได้ทั้งค่าผ่าตัดและค่ายา"] },
+            { q: "23. ลูกค้าประสบอุบัติเหตุรถจักยานยนต์ล้มทำให้ฟันหักหมอต้องทำการผ่าตัดตกแต่งบาดแผลเคสนี้สามารถเบิกเคลมได้หรือไม่?", a: "A", choices: ["เบิกเคลมผ่าตัดเล็กได้เพราะเกิดจากอุบัติเหตุ", "ไม่สามารถเบิกเคลมได้ถ้าเกี่ยวกับฟัน", "อุบัติเหตุไม่อยู่ในเงื่อนไขความคุ้มครอง", "ข้อ ข.และ ค.ถูก"] },
+            { q: "24. ลูกค้าตั้งครรฑ์ได้ 3 เดือน สามารถสมัครโครงการ PRU Healthy Plus ได้หรือไม่?", a: "C", choices: ["ได้เพราะไม่มีข้อยกเว้น", "ได้เพราะไม่ได้คุ้มครองการตั้งครรฑ์อยู่แล้ว", "ไม่ได้เพราะติดเงื่อไขข้อยกเว้น", "ถูกทั้งข้อ ก. และ ข."] },
+            { q: "25. นาย เฉย ได้ดื่มสุรากับ นาย ชา จนเมามาย ขากลับนายเฉย ขับรถชนต้นไม้ได้รับบาดเจ็บต้องเข้ารักษาตัวใน รพ. นายเฉยสามารถเบิกเคลมได้หรือไม่?", a: "A", choices: ["ไม่ได้เพราะเกิดเหตุในขณะมึนเมา", "ไม่ได้เพราะเป็นข้อยกเว้นของสัญญาสุขภาพและอุบัติเหตุ", "ไม่ได้เพราะเป็นคนขับชนต้นไม้เอง", "ถูกทุกข้อ"] },
+            { q: "26. ในการเบิกเคลม โครงการ PRU Healthy Plus ต้องใช้เอกสารอะไรบ้าง?", a: "D", choices: ["หนังสือเรียกร้องค่าสินไหมทดแทน", "รายงานของแพทย์หรือของสถานพยาบาล", "สำเนาบัตรประชาชนของผู้เอาประกันภัยสำเนาใบเสร็จรับเงิน หรือ ใบสรุปหน้างบการเงิน", "ถูกทุกข้อ"] },
+            { q: "27. ในการเบิกเคลมเงินชดเชยรายได้จาก โครงการ PRU Healthy Plus ต้องทำอย่างไร?", a: "D", choices: ["สามารถเคลมผ่าน PRU Connect (E-Claims)ได้", "ส่งเอกสารมาที่บริษัทPRUDENTAIL", "มาด้วยตัวเองที่ สนง.ใหญ่ชั้น 30", "ถูกทุกข้อ"] },
+            { q: "28. ลูกค้าจะได้รับเงินหลังจากยื่นเอกสารเบิกเคลมครบถ้วนภายในกี่วัน?", a: "D", choices: ["ไม่เกิน15วันทำการ", "ประมาณ 14 วันทำการ", "ภายใน 14 วันทำการ", "ภายใน 15 วันทำการ"] },
+            { q: "29. ส่วนใหญ่ลูกค้าจะได้รับเงินค่าสินไหมในรูปแบบใด?", a: "A", choices: ["โอนเข้าบัญชี", "เช็คเงินสด", "รับเป็นเงินสด", "ถูกทุกข้อ"] },
+            { q: "30. หัตถการทางการแพทย์ หมายถึงอะไร?", a: "D", choices: ["การรักษาผู้ป่วยโดยมีการใช้เครื่องมือและอุปกรณ์ต่าง ๆ เข้าสู่ร่างกายผู้ป่วย", "การใช้เข็มเจาะน้ำจากช่องปอด การใส่สายสวนหัวใจ การฉีดยาเข้าในข้อ การผ่าตัดต่าง ๆ การเย็บบาดแผล", "การเจาะเลือด การทำแผล การให้น้ำเกลือ และเป็นการทำการรักษาโดยแพทย์แผนปัจจุบัน", "ถูกทุกข้อ"] },
+            { q: "31. โรคในข้อใดมีระยะรอคอย 120 วัน?", a: "B", choices: ["เนื้องอก ถุงน้ำ หรือมะเร็งทุกชนิด,ริดสีดวงจมูก, เส้นเลือดขอดที่แขน", "ไส้เลื่อนทุกชนิด, ต้อเนื้อ หรือต้อกระจก,เยื่อบุโพรงมดลูกเจริญผิดที่", "เนื้องอกถุงน้ำ หรือมะเส็งทุกชนิด,ริดสีดวงทวาร,การตัดทอนซิล หรืออดีนอยด์", "ถูกทุกข้อ"] },
+            { q: "32. หากเบิกเคลม เงินชดเชยเต็มทุนไปแล้ว ค่าเบี้ยที่ต้องชำระจะลดลงหรือไม่?", a: "A", choices: ["ยังคงจ่ายเบี้ยคงที่เท่าเดิม", "ปรับลดลงเพราะไม่ต้องจ่ายเงินชดเชยแล้ว", "ต้องแจ้งขอลดไปที่บริษัท", "ไม่ต้องชำระเบี้ยทั้งสองสัญญา"] },
+            { q: "33. เมื่ออายุครบ 60 ปี ทางโครงการจะจ่ายเงินการันตี ให้ 20% หากฝากไว้กับบริษัทจะได้รับดอกเบี้ยเพิ่มหรือไม่?", a: "C", choices: ["ได้ 2%", "ได้ 4%", "ฝากได้แต่ไม่ได้ดอกเบี้ย", "บริษัทไม่รับฝาก"] },
+            { q: "34. กรณีถูกสุนัขกัดแล้วต้องมีการฉีดวัคซีนสามารถเบิกเคลมค่ารักษาได้เท่าไหร่?", a: "A", choices: ["เบิกไม่ได้", "เบิกได้ตามจริงไม่เกินทุนที่เลือก", "เบิกได้เฉพาะค่าชดเชยค่ารักษา", "ไม่มีข้อถูก"] },
+            { q: "35. หลังจากได้รับ 20% ไปแล้วหากเสียชีวิตจะได้ทุน 80% ใช่หรือไม่?", a: "A", choices: ["ไม่ใช่ต้องได้เงินชดเชย 100%", "ไม่ใช่ต้องได้เบี้ยคืน 100%", "ไม่ได้เพราะเสียชีวิตแล้ว", "ไม่ใช่เพราะต้องได้รับทุน 100%"] },
+            { q: "36. หลังจากได้รับทุน 100% ไปแล้วยังได้รับความคุ้มครองต่อหรือไม่?", a: "A", choices: ["ได้คุ้มครองปกติ", "ได้แต่ต้องชำระเบี้ยต่อ", "ได้อีก 80%", "ไม่มีข้อได้ถูก"] },
+            { q: "37. หากลูกค้ามีการเบิกเคลมเงินชดเชยนอน รพ.จากอุบัติเหตุหลังจากกรมธรรม์มีผลบังคับได้เพียง 10 วันได้หรือไม่?", a: "C", choices: ["ไม่ได้ ติดระยะรอคอย 30 วัน", "ไม่ได้ เพราะเกิดจากอุบัติเหตุ", "ได้เพราะเกิดจากอุบัติเหตุ", "ไม่ถูกทุกข้อ"] },
+            { q: "38. จากข้อ 37 ลูกค้าสามารถยกเลิก Free Look ได้หรือไม่?", a: "B", choices: ["ได้ตามปกติ", "ไม่ได้เพราะมีการเบิกเคลมไปแล้ว", "ได้ตามกฏหมาย", "ได้เพราะ คปภ.ไม่ได้ห้ามไว้"] },
+            { q: "39. โครงการ PRU Healthy Plus สามารถกู้ยืมเงินจากบริษัทโดยใช้กรมธรรม์เป็นประกันได้หรือไม่?", a: "A", choices: ["ได้", "ไม่ได้", "ไม่แน่ใจ", "ถูกทุกข้อ"] },
+            { q: "40. จากข้อที่39 หากกู้ได้เราควรแนะนำให้ลูกค้าว่าอย่างไร?", a: "A", choices: ["กู้ได้ตามมูลค่ากรมธรรม์และการกู้จะมีดอกเบี้ยที่ลูกค้าต้องชำระพร้อมเงินต้นหากไม่ชำระคืนอาจทำให้กรมธรรม์ขาดได้", "กู้ได้ตั้งแต่ปีที่1ไม่มีดอกเบี้ยมีแต่ค่าธรรมเนียมเล็กน้อยเท่านั้น", "จะกู้ตอนไหนก็ได้จะจ่ายยังไงก็ได้ตามที่ลูกค้าสะดวก", "ไม่แนะนำเพราะการกู้เงินต้องเสียดอกเบี้ยที่สูง"] },
+            { q: "41. ลูกค้าจะได้รับกรมธรรม์ภายในกี่วัน", a: "A", choices: ["15 วัน", "30 วัน", "5 วัน", "เมื่อไปรษณีย์ไปส่งให้"] },
+            { q: "42. หากลูกค้าต้องการยกเลิกหลังอายุ 60 ปีไปแล้วเราจะแนะนนำลูกค้าว่าอย่างไร?", a: "B", choices: ["สามารถยกเลิกได้ตามความต้องการของลูกค้าโดยไม่ขาดทุน", "หลังปีที่อายุครบ 60 ลูกค้าไม่ต้องชำระเบี้ยแล้วแต่ยังคงได้รับความคุ้มครองหากยกเลิกอาจทำให้เสียประโยชน์หลายอย่างได้", "หากยกเลิกจะไม่ได้อะไรคืนเลยไม่แนะนำ", "ให้โทรแจ้งที่ 1621"] },
+            { q: "43. จุดคุ้มทุนของโครงการ PRU Healthy Plus อยู่ที่ปีไหน?", a: "D", choices: ["ปีที่อายุครบ 60", "ปีที่อายุครบ 79", "ปีที่ลูกค้าอายุครบ 80", "ไม่มีข้อไดถูก"] },
+            { q: "44. คำว่า ผ่าตัดเล็ก หมายถึง?", a: "A", choices: ["การผ่าตัดได้เยื้อบุผิวหนังที่ใช้ยาระงับความรู้สึกเฉพาะส่วน ใช้เวลาไม่นาน", "การใช้อุปกรณ์ทางการแพทย์ในการดูดขุดเจาะส่อง", "ถูกทั้ง ก และ ข", "ไม่มีข้อถูก"] },
+            { q: "45. รู้สึกอ่อนเพลีย ก็เลยไป รพ.ขอหมอให้น้ำเกลือ 3 กระปุกนอนให้น้ำเกลือไป เกิน 6 ชั่วโมง สามารถเบิกเงินชดเชยได้หรือไม่?", a: "C", choices: ["หากเกิน 6 ชั่วโมงเบิกได้", "เบิกได้ตามเงื่อนไขนอนรพ.", "เบิกไม่ได้ไม่ได้เป็นความจำเป็นทางการแพทย์", "ไม่มีข้อถูก"] },
+            { q: "46. ก.มีอาการเจ็บฝ่าเท้าจึงไปหาหมอที่ รพ.หมอวินิจฉัยว่าเป็น ตาปลาต้องได้รับการผ่าตัดเอาออกเคสนี้จะเบิกเคลมส่วนใดได้บ้าง", a: "B", choices: ["เบิกค่าชดเชยนอน รพ.และเงินชดเชยผ่าตัดใหญ่พร้อมทั้งค่ายา", "เคลมได้ในส่วนเงินชดเชยค่าผ่าตัดเล็ก", "เคลม Day Case ได้", "เคลมไม่ได้"] },
+            { q: "47. ผ่าตัดส่งกล้องเคลมเงินชดเชยได้กี่วัน?", a: "A", choices: ["1 วัน", "ตามจำนวนที่นอน", "ไม่ได้นอนเคลมไม่ได้", "ขึ้นอยู่กับใบรับรองแพทย์"] },
+            { q: "48. จากข้อที่ 47 สามารถเบิกค่าชดเชยอะไรได้อีกบ้าง?", a: "A", choices: ["เชยเชยผ่าตัดใหญ่และค่าชดเชยค่ายา", "ค่าชดเชยผ่าตัดเล็ก", "ชดเชยค่ารักษา", "ชดเชยค่ายา"] },
+            { q: "49. หากได้รับค่าชดเชยลูกค้าสามารถฝากกับบริษัทได้หรือไม่", a: "A", choices: ["ไม่ได้", "ได้", "ไม่แน่ใจ", "ไม่มีข้อถูก"] },
+            { q: "50. ประกัน PRU Healthy Plus เรียกอีกอย่างหนึ่งว่า?", a: "A", choices: ["ประกันสะสมทรัพย์ 80/20", "ประกันชดเชยรายได้", "ประกันสะสมทรัพย์เพิ่มค่า80/20", "ประกันบำนาญ"] }
+        ];
 
-    // โหลดชื่อ และ ประสบการณ์ จาก Session / URL มาใส่ใน Input อัตโนมัติ (ถ้ามี)
-    document.addEventListener('DOMContentLoaded', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const storedName = urlParams.get('name') || sessionStorage.getItem('user_name');
-        if (storedName) {
-            document.getElementById('name').value = storedName;
+        const quizForm = document.getElementById('quizForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const resultDiv = document.getElementById('result');
+        const actionContainer = document.getElementById('actionContainer');
+        const nameInput = document.getElementById('name');
+        
+        const certificateWrapper = document.getElementById('certificate-wrapper');
+        const certName = document.getElementById('certName');
+        const certCourseName = document.getElementById('certCourseName');
+        const downloadCertBtn = document.getElementById('downloadCertBtn');
+        const quizHeader = document.getElementById('quizHeader').textContent;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const storedName = urlParams.get('name') || sessionStorage.getItem('user_name');
+            if (storedName) {
+                nameInput.value = storedName;
+            }
+        });
+
+        function renderQuiz() {
+            loading.classList.add('hidden');
+            quizForm.classList.remove('hidden');
+            submitBtn.classList.remove('hidden');
+
+            questions.forEach((q, index) => {
+                const container = document.createElement('div');
+                container.className = 'question-container';
+
+                const questionTitle = document.createElement('h3');
+                questionTitle.textContent = q.q;
+                container.appendChild(questionTitle);
+
+                const ul = document.createElement('ul');
+                ul.className = 'choices';
+
+                q.choices.forEach((choice, i) => {
+                    const li = document.createElement('li');
+                    const label = document.createElement('label');
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `question-${index}`;
+                    input.value = String.fromCharCode(65 + i);
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(` ${input.value}. ${choice}`));
+                    li.appendChild(label);
+                    ul.appendChild(li);
+                });
+
+                container.appendChild(ul);
+                quizForm.appendChild(container);
+            });
         }
-    });
+        
+        async function initialize() {
+            try {
+                const { data: { user }, error } = await supabase.auth.getUser();
+                if (user) currentUser = user;
+            } catch (e) {
+                console.warn("Could not retrieve current user.", e);
+            }
+            renderQuiz();
+        }
 
-    function renderQuiz() {
-        loading.classList.add('hidden');
-        quizForm.classList.remove('hidden');
-        submitBtn.classList.remove('hidden');
+        initialize();
 
-        questions.forEach((q, index) => {
-            const container = document.createElement('div');
-            container.className = 'question-container';
+        submitBtn.addEventListener('click', async () => {
+            const userNameVal = nameInput.value.trim();
+            if (!userNameVal) {
+                alert("กรุณากรอกชื่อผู้ทำแบบทดสอบก่อนส่งคำตอบครับ");
+                nameInput.focus();
+                return;
+            }
 
-            const questionTitle = document.createElement('h3');
-            questionTitle.textContent = q.q;
-            container.appendChild(questionTitle);
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'กำลังส่งคำตอบ...';
 
-            const ul = document.createElement('ul');
-            ul.className = 'choices';
+            let score = 0;
+            const answers = [];
 
-            q.choices.forEach((choice, i) => {
-                const li = document.createElement('li');
-                const label = document.createElement('label');
-                const input = document.createElement('input');
-                input.type = 'radio';
-                input.name = `question-${index}`;
-                input.value = String.fromCharCode(65 + i);
-                label.appendChild(input);
-                label.appendChild(document.createTextNode(`${input.value}. ${choice}`));
-                li.appendChild(label);
-                ul.appendChild(li);
+            questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="question-${index}"]:checked`);
+                const answer = selected ? selected.value : null; 
+                answers.push(answer);
+                if (answer === q.a) score++;
             });
 
-            container.appendChild(ul);
-            quizForm.appendChild(container);
-        });
-    }
-    
-    async function initialize() {
-        try {
-            const { data: { user }, error } = await supabase.auth.getUser();
-            if (user) {
-                currentUser = user;
-            }
-        } catch (e) {
-            console.warn("Could not retrieve current user. Running as anonymous.", e);
-        }
+            const totalQuestions = questions.length;
+            const percentage = Math.round((score / totalQuestions) * 100);
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || currentUser?.email || "anonymous@example.com";
+            const userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || "ไม่ระบุ";
 
-        renderQuiz();
-    }
+            try {
+                const { error } = await supabase
+                    .from('quiz_results')
+                    .insert([{
+                        user_email: userEmail,
+                        name: userNameVal,
+                        score: score,
+                        total_questions: totalQuestions,
+                        answers: answers,
+                        experience: userExperience,
+                        quiz_set: quizHeader
+                    }]);
 
-    initialize();
+                if (error) throw error; 
 
-    // --- Event Listener: Submit Button ---
-    submitBtn.addEventListener('click', async () => {
-        submitBtn.disabled = true;
+                if (percentage >= 80) {
+                    resultDiv.innerHTML = `🎉 ยินดีด้วย! คุณสอบผ่าน (${percentage}%) ได้คะแนน ${score} จาก ${totalQuestions} ข้อ`;
+                    resultDiv.style.backgroundColor = '#d1ffd1';
+                    resultDiv.style.color = '#005900';
+                    
+                    certName.textContent = userNameVal;
+                    certCourseName.textContent = quizHeader.replace('แบบทดสอบปรนัย: ', '').replace(/\s*\(.*\)/, '');
+                    
+                    certificateWrapper.style.display = 'block';
+                    quizForm.style.display = 'none';
+                    submitBtn.style.display = 'none';
+                } else {
+                    resultDiv.innerHTML = `❌ คุณได้คะแนน ${score} จาก ${totalQuestions} ข้อ (${percentage}%) ยังไม่ผ่านเกณฑ์ (ต้องได้ 80% ขึ้นไป)`;
+                    resultDiv.style.backgroundColor = '#ffd1d1';
+                    resultDiv.style.color = '#900';
+                    submitBtn.style.display = 'none';
 
-        let score = 0;
-        const answers = [];
-
-        // 1. คำนวณคะแนนและรวบรวมคำตอบ
-        questions.forEach((q, index) => {
-            const selected = document.querySelector(`input[name="question-${index}"]:checked`);
-            const answer = selected ? selected.value : null; 
-            answers.push(answer);
-            if (answer === q.a) score++;
-        });
-
-        const totalQuestions = questions.length;
-        
-        // 🔥 ดึงข้อมูล Email, Name และ Experience จาก URL Params หรือ sessionStorage
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        const userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || currentUser?.email || "anonymous@example.com";
-        const userName = document.getElementById('name').value.trim() || urlParams.get('name') || sessionStorage.getItem('user_name') || "ไม่ระบุชื่อ";
-        
-        // 🔥 ดึงค่าประสบการณ์ (Experience)
-        const userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || "ไม่ระบุ";
-
-        // 2. บันทึกผลลัพธ์โดยใช้ Supabase Client (แนบ experience ไปด้วย)
-        const { error } = await supabase
-            .from('quiz_results')
-            .insert([
-                {
-                    user_email: userEmail,
-                    name: userName,
-                    score: score,
-                    total_questions: totalQuestions,
-                    answers: answers,
-                    experience: userExperience // 🔥 บันทึกค่าประสบการณ์ลง Supabase ที่นี่!
+                    const retryBtn = document.createElement('button');
+                    retryBtn.textContent = 'ทำแบบทดสอบใหม่อีกครั้ง';
+                    retryBtn.style.backgroundColor = '#dc3545';
+                    retryBtn.onclick = () => location.reload();
+                    actionContainer.innerHTML = ''; 
+                    actionContainer.appendChild(retryBtn);
                 }
-            ]);
 
-        // 3. จัดการผลลัพธ์และการแสดงผล
-        if (error) {
-            console.error('Error saving quiz result:', error.message);
-            resultDiv.textContent = `เกิดข้อผิดพลาดในการบันทึกผล (รหัส: ${error.code}) กรุณาลองใหม่`;
-            resultDiv.style.backgroundColor = '#ffd1d1';
-            resultDiv.style.color = '#900';
-            submitBtn.disabled = false;
-        } else {
-            console.log("Quiz result saved successfully.");
-            resultDiv.textContent = `บันทึกผลสำเร็จ! คุณได้คะแนน ${score} จาก ${totalQuestions} ข้อ`;
-            resultDiv.style.backgroundColor = '#d1ffd1';
-            resultDiv.style.color = '#005900';
-        }
+                resultDiv.style.display = 'block';
 
-        resultDiv.style.display = 'block';
-    });
-</script>
+            } catch (err) {
+                console.error('Error saving quiz result:', err.message || err);
+                resultDiv.textContent = `เกิดข้อผิดพลาดในการบันทึกผล (ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต) กรุณาลองใหม่`;
+                resultDiv.style.backgroundColor = '#ffd1d1';
+                resultDiv.style.color = '#900';
+                resultDiv.style.display = 'block';
+                
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'ส่งคำตอบ';
+            }
+        });
+
+        downloadCertBtn.addEventListener('click', () => {
+            window.print();
+        });
+    </script>
 </body>
 </html>
