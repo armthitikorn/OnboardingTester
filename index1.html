@@ -132,30 +132,48 @@
         }
         
 @media print {
-            /* 1. ซ่อนทุกอย่างบนหน้าเว็บ เพื่อล้างพื้นที่ */
-            body {
-                visibility: hidden;
-                background: #fff;
-                margin: 0;
-            }
-            
-            /* 2. บังคับให้ใบประกาศโชว์ขึ้นมา และจับขึงกึ่งกลางแบบตายตัว */
-            #certificate {
-                visibility: visible;
-                position: absolute !important;
-                top: 50% !important;
-                left: 50% !important;
-                transform: translate(-50%, -50%) !important;
-                width: 90% !important;
-                max-width: 950px !important;
-                box-shadow: none !important;
-                margin: 0 !important;
-            }
-
-            /* 3. ลบขอบกระดาษ เพื่อไม่ให้มี วันที่ และ URL ของเบราว์เซอร์ติดมา */
+            /* 1. ตั้งค่าหน้ากระดาษเป็น A4 แนวนอน และลบ Margin เพื่อซ่อน Header/Footer (วันที่, URL) */
             @page {
                 size: A4 landscape;
-                margin: 0;
+                margin: 0mm !important; 
+            }
+            
+            /* 2. ซ่อนเนื้อหาทั้งหมดในหน้าเว็บ (ยกเว้นใบประกาศ) */
+            body > *:not(#certificate-wrapper) {
+                display: none !important;
+            }
+
+            /* 3. ล็อกกล่องคลุมใบประกาศให้เต็ม 1 หน้ากระดาษพอดี ป้องกันการขึ้นหน้าใหม่ */
+            #certificate-wrapper {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: white !important;
+            }
+
+            /* 4. จัดทรงใบประกาศให้อยู่กึ่งกลาง และจำกัดขนาดไม่ให้ล้นหน้า A4 */
+            #certificate {
+                display: block !important;
+                width: 90% !important;
+                max-width: 260mm !important; 
+                margin: auto !important;
+                position: static !important;
+                transform: none !important;
+                box-shadow: none !important;
+                page-break-inside: avoid !important;
+            }
+
+            /* 5. ซ่อนปุ่มดาวน์โหลดและลิงก์ต่างๆ ตอนสั่งพิมพ์ */
+            #certificate-wrapper button, 
+            #certificate-wrapper a {
+                display: none !important;
             }
         }
     </style>
