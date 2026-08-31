@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>แบบทดสอบ: Copayment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: #f9faff;
+            color: #333;
+            padding: 20px;
+        }
+        h2 {
+            color: #004080;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .question-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .question h3 {
+            color: #0059b3;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+        .choices {
+            list-style: none;
+            padding: 0;
+        }
+        .choices li {
+            margin-bottom: 8px;
+        }
+        .choices label {
+            display: block;
+            background: #e6f2ff;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .choices label:hover {
+            background-color: #cce6ff;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            font-size: 1.1rem;
+            background-color: #007acc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 20px auto 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        button:hover {
+            background-color: #005fa3;
+        }
+        #result {
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            font-size: 1.2rem;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .loading-text {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            margin-top: 50px;
+        }
+        .hidden {
+            display: none;
+        }
+        
+        /* สไตล์สำหรับใบประกาศนียบัตรจำลอง */
+        #certificate-wrapper {
+            display: none;
+            text-align: center;
+            margin-top: 40px;
+        }
+        #certificate {
+            background: #fff;
+            border: 15px solid #004080;
+            padding: 15px;
+            text-align: center;
+            border-radius: 4px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .cert-inner {
+            border: 2px solid #d4af37;
+            padding: 50px 30px;
+            background-color: #faf9f5;
+        }
+        .cert-title {
+            color: #d4af37; 
+            font-family: 'Georgia', serif; 
+            font-size: 2.5rem; 
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .cert-name {
+            color: #004080; 
+            font-size: 2rem;
+            border-bottom: 2px solid #004080; 
+            display: inline-block; 
+            padding: 0 40px 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 0mm !important; 
+            }
+            
+            body > *:not(#certificate-wrapper) {
+                display: none !important;
+            }
+
+            #certificate-wrapper {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: white !important;
+            }
+
+            #certificate {
+                display: block !important;
+                width: 90% !important;
+                max-width: 260mm !important; 
+                margin: auto !important;
+                position: static !important;
+                transform: none !important;
+                box-shadow: none !important;
+                page-break-inside: avoid !important;
+            }
+
+            #certificate-wrapper button, 
+            #certificate-wrapper a {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h2 id="quizHeader">แบบทดสอบปรนัย: ความรู้เกี่ยวกับประกัน (60 ข้อ)</h2>
+
+    <div id="loading" class="loading-text">กำลังโหลดแบบทดสอบ...</div>
+
+    <div style="margin-bottom: 20px;">
+        <label for="name">ชื่อผู้ทำแบบทดสอบ:</label>
+        <input type="text" id="name" name="name" required style="width:100%;padding:10px;margin-top:5px;" placeholder="กรุณากรอกชื่อ-นามสกุล">
+    </div>
+    
+    <form id="quizForm" class="hidden"></form>
+
+    <button id="submitBtn" class="hidden">ส่งคำตอบ</button>
+
+    <div id="result"></div>
+    <div id="actionContainer" style="text-align: center; margin-top: 20px;"></div>
+
+    <!-- ส่วนแสดงใบประกาศนียบัตร -->
+    <div id="certificate-wrapper">
+        <div id="certificate">
+            <div class="cert-inner">
+                <h1 class="cert-title">Certificate of Achievement</h1>
+                <p style="font-size: 1.2rem; color: #555; margin-top: 20px;">ขอมอบประกาศนียบัตรฉบับนี้เพื่อให้เกียรติว่า</p>
+                <h2 id="certName" class="cert-name">-</h2>
+                <p style="font-size: 1.2rem; color: #555; margin-top: 10px;">
+                    ได้ผ่านการทดสอบหลักสูตร <br> 
+                    <strong id="certCourseName" style="color: #333; font-size: 1.5rem;">-</strong> <br> 
+                    ด้วยคะแนนที่ผ่านเกณฑ์มาตรฐานอย่างสมบูรณ์
+                </p>
+                <div style="margin-top: 50px; text-align: center;">
+                    <div style="display: inline-block; width: 200px; border-top: 1px solid #333; padding-top: 10px; margin: 0 20px;">
+                        <p style="margin: 0; font-size: 0.9rem;">Prudential Life Assurance</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button id="downloadCertBtn" style="background-color: #28a745; max-width: 250px; margin: 30px auto;">
+            📥 ดาวน์โหลดใบประกาศ
+        </button>
+        <!-- ลิงก์สิ้นสุดหลักสูตรทั้งหมด -->
+        <a href="index.html" id="nextPageLink" style="text-decoration: none;">
+            <button style="margin-top: 10px; background-color: #28a745; max-width: 250px; margin: 10px auto;">🏠 เสร็จสิ้นหลักสูตร (กลับหน้าหลัก)</button>
+        </a>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // --- Supabase Setup ---
+        const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+
+        // ข้อมูลคำถาม ชุดที่ 12 (ความรู้เกี่ยวกับประกันชีวิต)
+ const questions = [
+    // ระดับเริ่มต้น (1-20)
+    { q: "1. วัตถุประสงค์สำคัญของการประกันชีวิตคือข้อใด", a: "B", choices: ["รับประกันว่าจะได้รับเงินมากกว่าเบี้ยที่ชำระทุกกรณี", "ถ่ายโอนความเสี่ยงทางการเงินบางส่วนไปยังบริษัทประกันชีวิต", "ใช้แทนบัญชีเงินฝากธนาคาร", "ใช้เพื่อเก็งกำไรระยะสั้น"] },
+    { q: "2. ผู้เอาประกันภัย หมายถึงบุคคลใด", a: "A", choices: ["บุคคลที่ได้รับความคุ้มครองตามกรมธรรม์", "บุคคลที่ขายกรมธรรม์", "บุคคลที่ตรวจสุขภาพผู้สมัคร", "บุคคลที่อนุมัติสินไหม"] },
+    { q: "3. ผู้รับประโยชน์ หมายถึงบุคคลใด", a: "B", choices: ["ผู้ที่มีหน้าที่เก็บเบี้ยประกันภัย", "ผู้ที่ได้รับผลประโยชน์ตามเงื่อนไขเมื่อเกิดเหตุที่กำหนด", "เจ้าหน้าที่โรงพยาบาล", "ผู้พิจารณารับประกันภัย"] },
+    { q: "4. เบี้ยประกันภัย หมายถึงข้อใด", a: "A", choices: ["จำนวนเงินที่ผู้ขอเอาประกันภัยชำระเพื่อแลกกับความคุ้มครอง", "จำนวนเงินที่โรงพยาบาลต้องชำระให้บริษัท", "ค่าธรรมเนียมของผู้รับประโยชน์", "จำนวนเงินที่บริษัทต้องจ่ายทุกปีโดยไม่มีเงื่อนไข"] },
+    { q: "5. กรมธรรม์ประกันภัยมีความสำคัญอย่างไร", a: "B", choices: ["เป็นใบเสร็จรับเงินเท่านั้น", "เป็นเอกสารแสดงสิทธิ หน้าที่ ความคุ้มครอง และเงื่อนไขของสัญญา", "เป็นเอกสารโฆษณาผลิตภัณฑ์", "เป็นใบรับรองแพทย์"] },
+    { q: "6. เงินเอาประกันภัยหรือทุนประกันภัย หมายถึงข้อใด", a: "B", choices: ["เบี้ยประกันภัยที่ชำระสะสมทั้งหมด", "จำนวนเงินที่บริษัทกำหนดให้จ่ายตามเหตุและเงื่อนไขในกรมธรรม์", "ค่าใช้จ่ายที่โรงพยาบาลเรียกเก็บ", "เงินเดือนของผู้เอาประกันภัย"] },
+    { q: "7. ประกันสุขภาพมีวัตถุประสงค์หลักอย่างไร", a: "A", choices: ["ช่วยบริหารความเสี่ยงด้านค่าใช้จ่ายจากการรักษาพยาบาล", "รับประกันว่าจะไม่เจ็บป่วย", "ทำให้สามารถรักษาได้ทุกโรคโดยไม่มีข้อยกเว้น", "ใช้แทนประกันชีวิตทุกประเภท"] },
+    { q: "8. IPD หมายถึงข้อใด", a: "B", choices: ["ผู้ป่วยนอก", "ผู้ป่วยใน", "ผู้ป่วยฉุกเฉินเท่านั้น", "ผู้ตรวจสุขภาพประจำปี"] },
+    { q: "9. OPD หมายถึงข้อใด", a: "A", choices: ["ผู้ป่วยนอก", "ผู้ป่วยใน", "ผู้ป่วยที่ผ่าตัดใหญ่เท่านั้น", "ผู้รับประโยชน์"] },
+    { q: "10. ผู้ที่เข้ารับการตรวจและรับยาโดยไม่ต้องลงทะเบียนพักรักษาตัวเป็นผู้ป่วยใน โดยทั่วไปจัดเป็นผู้ป่วยประเภทใด", a: "B", choices: ["IPD", "OPD", "ICU", "Day Surgery ทุกกรณี"] },
+    { q: "11. เหตุใดผู้ขอเอาประกันภัยจึงต้องตอบคำถามสุขภาพตามความเป็นจริง", a: "A", choices: ["เพื่อให้บริษัทสามารถประเมินความเสี่ยงได้อย่างถูกต้อง", "เพื่อให้ได้รับของสมนาคุณ", "เพื่อไม่ต้องอ่านกรมธรรม์", "เพื่อให้เบี้ยประกันภัยเท่ากันทุกคน"] },
+    { q: "12. การปกปิดโรคหรือข้อมูลสุขภาพที่เป็นสาระสำคัญอาจมีผลอย่างไร", a: "C", choices: ["ไม่มีผลต่อสัญญา", "บริษัทต้องจ่ายผลประโยชน์ทุกกรณี", "อาจมีผลต่อความสมบูรณ์ของสัญญาและการพิจารณาสินไหม", "ทำให้ผู้รับประโยชน์เปลี่ยนแปลงอัตโนมัติ"] },
+    { q: "13. ประกันชีวิตแบบชั่วระยะเวลามีลักษณะสำคัญอย่างไร", a: "A", choices: ["คุ้มครองการเสียชีวิตภายในระยะเวลาที่กำหนด", "จ่ายเงินคืนทุกปีทุกแบบ", "คุ้มครองค่ารักษาพยาบาลทุกประเภท", "ไม่มีการกำหนดระยะเวลาคุ้มครอง"] },
+    { q: "14. ประกันชีวิตแบบตลอดชีพเหมาะกับวัตถุประสงค์ใดมากที่สุด", a: "A", choices: ["ความคุ้มครองชีวิตระยะยาว", "การเก็งกำไรจากหุ้น", "การประกันรถยนต์", "การรักษาผู้ป่วยนอกระยะสั้น"] },
+    { q: "15. ประกันชีวิตแบบสะสมทรัพย์มีลักษณะสำคัญอย่างไร", a: "B", choices: ["มีเฉพาะความคุ้มครองอุบัติเหตุ", "ให้ความคุ้มครองชีวิตและผลประโยชน์กรณีอยู่ครบสัญญาตามเงื่อนไข", "ไม่มีวันครบกำหนดสัญญา", "เบี้ยประกันภัยสามารถถอนได้ทุกเวลาโดยไม่เสียประโยชน์"] },
+    { q: "16. ข้อใดกล่าวถึงประกันชีวิตแบบสะสมทรัพย์ได้ถูกต้องที่สุด", a: "C", choices: ["เป็นบัญชีเงินฝากธนาคารประเภทหนึ่ง", "สามารถถอนเงินต้นได้ครบทุกเวลา", "เป็นสัญญาประกันชีวิตที่มีเงื่อนไขความคุ้มครองและผลประโยชน์ตามกรมธรรม์", "ไม่มีความคุ้มครองกรณีเสียชีวิต"] },
+    { q: "17. การเรียกร้องผลประโยชน์ตามกรมธรรม์เรียกว่าอะไร", a: "A", choices: ["Claim", "Premium", "Underwriting", "Exclusion"] },
+    { q: "18. ข้อยกเว้นในกรมธรรม์หมายถึงข้อใด", a: "A", choices: ["เหตุการณ์หรือกรณีที่กรมธรรม์ไม่ให้ความคุ้มครองตามที่ระบุ", "จำนวนเงินคืนระหว่างสัญญา", "ระยะเวลาชำระเบี้ย", "รายชื่อโรงพยาบาลทั้งหมด"] },
+    { q: "19. ก่อนตัดสินใจทำประกัน ผู้ขอเอาประกันภัยควรดำเนินการอย่างไร", a: "A", choices: ["พิจารณาความต้องการ ความคุ้มครอง ข้อยกเว้น และความสามารถในการชำระเบี้ย", "เลือกกรมธรรม์ที่มีเบี้ยสูงที่สุดเสมอ", "เชื่อเฉพาะคำโฆษณาโดยไม่อ่านเอกสาร", "เลือกจากของสมนาคุณเป็นหลัก"] },
+    { q: "20. สำนักงาน คปภ. คือหน่วยงานใด", a: "A", choices: ["สำนักงานคณะกรรมการกำกับและส่งเสริมการประกอบธุรกิจประกันภัย", "สำนักงานคณะกรรมการกำกับการรักษาพยาบาล", "สำนักงานคุ้มครองผู้ฝากเงิน", "สำนักงานประกันสังคมแห่งชาติ"] },
+
+    // ระดับยาก (21-40)
+    { q: "21. Premium หมายถึงข้อใด", a: "B", choices: ["ทุนประกันภัย", "เบี้ยประกันภัย", "เงินสินไหม", "มูลค่าเวนคืน"] },
+    { q: "22. Sum Assured หมายถึงข้อใด", a: "A", choices: ["จำนวนเงินเอาประกันภัย", "ระยะเวลารอคอย", "เบี้ยต่ออายุ", "ค่าใช้จ่ายส่วนแรก"] },
+    { q: "23. Beneficiary หมายถึงข้อใด", a: "B", choices: ["ผู้พิจารณารับประกันภัย", "ผู้รับประโยชน์", "ผู้ตรวจสอบสินไหม", "ผู้ให้บริการทางการแพทย์"] },
+    { q: "24. Policyholder หมายถึงข้อใด", a: "A", choices: ["ผู้ถือกรมธรรม์", "ผู้รับประโยชน์ทุกกรณี", "แพทย์ผู้รักษา", "ผู้ประเมินความเสียหาย"] },
+    { q: "25. Underwriting หมายถึงกระบวนการใด", a: "B", choices: ["การยื่นเคลม", "การประเมินและพิจารณารับความเสี่ยง", "การเวนคืนกรมธรรม์", "การเปลี่ยนผู้รับประโยชน์"] },
+    { q: "26. Health Rider หมายถึงข้อใด", a: "B", choices: ["กรมธรรม์ประกันรถยนต์", "สัญญาเพิ่มเติมที่แนบท้ายกรมธรรม์หลักเพื่อให้ความคุ้มครองด้านสุขภาพ", "ใบรับรองแพทย์", "หนังสือแจ้งเตือนการชำระเบี้ย"] },
+    { q: "27. Waiting Period หมายถึงข้อใด", a: "B", choices: ["ระยะเวลาผ่อนผันการชำระเบี้ย", "ระยะเวลาที่ความคุ้มครองบางกรณียังไม่เริ่มตามเงื่อนไข", "ระยะเวลาพิจารณาภาษี", "ระยะเวลาที่ใช้เปลี่ยนผู้รับประโยชน์"] },
+    { q: "28. Grace Period หมายถึงข้อใด", a: "B", choices: ["ระยะเวลารอคอยโรค", "ระยะเวลาผ่อนผันการชำระเบี้ยประกันภัย", "ระยะเวลาก่อนเข้ารักษา", "ระยะเวลาหลังออกจากโรงพยาบาล"] },
+    { q: "29. Pre-existing Condition หมายถึงข้อใด", a: "B", choices: ["การเจ็บป่วยที่เกิดหลังกรมธรรม์สิ้นสุด", "สภาพหรือภาวะที่เป็นมาก่อนเริ่มความคุ้มครองตามคำนิยามในกรมธรรม์", "โรคที่เกิดจากอุบัติเหตุเท่านั้น", "โรคที่บริษัทต้องรับประกันทุกกรณี"] },
+    { q: "30. Medical Necessity หมายถึงข้อใด", a: "B", choices: ["การรักษาที่ผู้เอาประกันภัยต้องการทุกประเภท", "การรักษาที่สอดคล้องกับการวินิจฉัย ข้อบ่งชี้ และมาตรฐานทางการแพทย์", "การรักษาที่มีค่าใช้จ่ายสูงเท่านั้น", "การรักษาในโรงพยาบาลเอกชนเท่านั้น"] },
+    { q: "31. Exclusion หมายถึงข้อใด", a: "A", choices: ["ข้อยกเว้นความคุ้มครอง", "เงินคืนระหว่างสัญญา", "การต่ออายุสัญญา", "ค่าใช้จ่ายส่วนแรก"] },
+    { q: "32. Lapse หมายถึงข้อใด", a: "A", choices: ["กรมธรรม์สิ้นผลบังคับเนื่องจากไม่ปฏิบัติตามเงื่อนไขการชำระเบี้ย", "การเพิ่มทุนประกันภัย", "การยื่นคำร้องสินไหม", "การเปลี่ยนงวดชำระเบี้ย"] },
+    { q: "33. Reinstatement หมายถึงข้อใด", a: "B", choices: ["การเวนคืนกรมธรรม์", "การขอคืนสภาพกรมธรรม์ที่สิ้นผลบังคับตามหลักเกณฑ์ของบริษัท", "การลดทุนประกันภัยอัตโนมัติ", "การขอรับเงินครบกำหนดสัญญา"] },
+    { q: "34. Surrender หมายถึงข้อใด", a: "B", choices: ["การต่ออายุสัญญาสุขภาพ", "การเวนคืนหรือยกเลิกกรมธรรม์ก่อนครบกำหนดตามเงื่อนไข", "การเพิ่มสัญญาเพิ่มเติม", "การสำรองจ่ายค่ารักษา"] },
+    { q: "35. Cash Surrender Value หมายถึงข้อใด", a: "B", choices: ["เงินเอาประกันภัยกรณีเสียชีวิต", "มูลค่าเวนคืนกรมธรรม์", "เงินชดเชยรายวัน", "ค่ารักษาพยาบาลส่วนเกิน"] },
+    { q: "36. Paid-up Policy หรือมูลค่าใช้เงินสำเร็จหมายถึงข้อใด", a: "A", choices: ["หยุดชำระเบี้ยและคงความคุ้มครองในจำนวนที่ลดลงตามเงื่อนไข", "ยกเลิกกรมธรรม์และรับเบี้ยคืนทั้งหมด", "เพิ่มทุนประกันโดยไม่ต้องชำระเบี้ย", "เปลี่ยนประกันชีวิตเป็นประกันสุขภาพ"] },
+    { q: "37. Maturity Benefit หมายถึงข้อใด", a: "A", choices: ["ผลประโยชน์กรณีอยู่ครบกำหนดสัญญาตามเงื่อนไข", "ผลประโยชน์กรณีเข้ารักษาตัวเป็นผู้ป่วยนอก", "ค่าใช้จ่ายส่วนแรก", "เบี้ยประกันภัยงวดสุดท้าย"] },
+    { q: "38. Daily Hospital Cash หมายถึงข้อใด", a: "B", choices: ["การชำระค่ารักษาตามใบเสร็จทุกบาท", "ผลประโยชน์ชดเชยรายวันตามจำนวนและเงื่อนไขที่กำหนดเมื่อเข้ารักษาเป็นผู้ป่วยใน", "เงินปันผลประจำวัน", "เงินคืนเบี้ยประกันภัยรายวัน"] },
+    { q: "39. Network Hospital หมายถึงข้อใด", a: "B", choices: ["โรงพยาบาลทุกแห่งในต่างประเทศ", "โรงพยาบาลที่มีข้อตกลงให้บริการกับบริษัทประกันภัย", "โรงพยาบาลเฉพาะของรัฐ", "สถานพยาบาลที่ไม่ต้องมีใบอนุญาต"] },
+    { q: "40. Claim Ratio ในบริบททั่วไปของประกันสุขภาพหมายถึงข้อใด", a: "B", choices: ["สัดส่วนจำนวนพนักงานต่อจำนวนลูกค้า", "อัตราส่วนค่าสินไหมทดแทนเมื่อเทียบกับฐานที่กำหนด เช่น เบี้ยประกันสุขภาพ", "สัดส่วนเงินเดือนต่อเบี้ย", "สัดส่วนทุนประกันต่ออายุของลูกค้า"] },
+
+    // ระดับยากมาก (41-60)
+    { q: "41. Deductible หมายถึงข้อใด", a: "B", choices: ["เงินคืนเมื่อครบสัญญา", "จำนวนค่าใช้จ่ายส่วนแรกที่ผู้เอาประกันภัยต้องรับผิดชอบก่อน", "สัดส่วนเงินปันผลของบริษัท", "ส่วนลดภาษี"] },
+    { q: "42. Copayment หมายถึงข้อใด", a: "B", choices: ["ค่าใช้จ่ายที่บริษัทรับผิดชอบทั้งหมด", "การที่ผู้เอาประกันภัยร่วมรับผิดชอบค่าใช้จ่ายตามสัดส่วนที่กำหนด", "การเวนคืนกรมธรรม์", "การขอคืนสภาพกรมธรรม์"] },
+    { q: "43. ข้อใดอธิบายความแตกต่างระหว่าง Deductible และ Copayment ได้ถูกต้อง", a: "B", choices: ["Deductible เป็นสัดส่วน ส่วน Copayment เป็นจำนวนเงินคงที่เสมอ", "Deductible เป็นค่าใช้จ่ายส่วนแรกตามจำนวนที่กำหนด ส่วน Copayment เป็นการร่วมจ่ายตามสัดส่วน", "ทั้งสองคำหมายถึงการเวนคืนกรมธรรม์", "ทั้งสองคำใช้เฉพาะประกันชีวิตแบบสะสมทรัพย์"] },
+    { q: "44. ค่ารักษาที่ได้รับความคุ้มครองเท่ากับ 100,000 บาท และกรมธรรม์กำหนด Copayment 20% ผู้เอาประกันภัยร่วมจ่ายเท่าใด", a: "B", choices: ["10,000 บาท", "20,000 บาท", "80,000 บาท", "100,000 บาท"] },
+    { q: "45. จากข้อ 44 บริษัทประกันภัยรับผิดชอบเท่าใด หากค่าใช้จ่ายทั้งหมดอยู่ในความคุ้มครอง", a: "C", choices: ["20,000 บาท", "40,000 บาท", "80,000 บาท", "100,000 บาท"] },
+    { q: "46. ค่ารักษาที่ได้รับความคุ้มครองเท่ากับ 100,000 บาท และมี Deductible 30,000 บาท โดยไม่มี Copayment บริษัทจะพิจารณาจ่ายส่วนที่เหลือเท่าใด", a: "C", choices: ["30,000 บาท", "50,000 บาท", "70,000 บาท", "100,000 บาท"] },
+    { q: "47. ค่ารักษาที่ได้รับความคุ้มครองเท่ากับ 250,000 บาท มี Deductible 50,000 บาท และไม่มี Copayment บริษัทจะพิจารณาจ่ายเท่าใด", a: "C", choices: ["50,000 บาท", "150,000 บาท", "200,000 บาท", "250,000 บาท"] },
+    { q: "48. กรมธรรม์มี Deductible 100,000 บาท และมี Copayment 30% หลังหัก Deductible หากค่ารักษาที่ได้รับความคุ้มครองเท่ากับ 200,000 บาท ผู้เอาประกันภัยรับผิดชอบรวมเท่าใด", a: "D", choices: ["30,000 บาท", "60,000 บาท", "100,000 บาท", "130,000 บาท"] },
+    { q: "49. จากข้อ 48 บริษัทประกันภัยพิจารณารับผิดชอบเท่าใด", a: "B", choices: ["30,000 บาท", "70,000 บาท", "100,000 บาท", "130,000 บาท"] },
+    { q: "50. ข้อใดกล่าวถูกต้องเกี่ยวกับ Copayment ตั้งแต่เริ่มทำประกัน", a: "A", choices: ["ผู้เอาประกันภัยร่วมจ่ายตามสัดส่วนที่กำหนดในสัญญาเมื่อมีการเรียกร้องผลประโยชน์ที่เข้าเงื่อนไข", "ใช้เฉพาะเมื่อผู้เอาประกันภัยขาดชำระเบี้ย", "เป็นการเวนคืนกรมธรรม์บางส่วน", "บริษัทสามารถเพิ่มเงื่อนไขภายหลังได้เสมอโดยไม่ต้องแจ้ง"] },
+    { q: "51. ข้อใดกล่าวถูกต้องเกี่ยวกับ Copayment ในเงื่อนไขการต่ออายุ", a: "B", choices: ["ใช้กับผู้เอาประกันภัยทุกคนโดยอัตโนมัติ", "ใช้พิจารณาในช่วงต่ออายุเมื่อเข้าเงื่อนไขที่ระบุไว้", "บริษัทเพิ่มเงื่อนไขได้ภายหลังโดยไม่เคยแจ้งไว้", "ทำให้กรมธรรม์สิ้นผลบังคับทันที"] },
+    { q: "52. ตามแนวทาง Copayment Renewal กรณีการเคลมผู้ป่วยในด้วยกลุ่มโรคป่วยเล็กน้อยทั่วไป ต้องเกิดเงื่อนไขใดร่วมกัน", a: "C", choices: ["เคลมอย่างน้อย 1 ครั้ง และ Claim Ratio 50%", "เคลมตั้งแต่ 2 ครั้ง และ Claim Ratio 100%", "เคลมตั้งแต่ 3 ครั้งขึ้นไป มีลักษณะตามเกณฑ์ความจำเป็นทางการแพทย์ และ Claim Ratio ตั้งแต่ 200%", "เคลมตั้งแต่ 5 ครั้ง โดยไม่พิจารณา Claim Ratio"] },
+    { q: "53. หากเข้าเงื่อนไข Copayment Renewal กรณีโรคป่วยเล็กน้อยทั่วไปตามหลักเกณฑ์ อัตราร่วมจ่ายในปีกรมธรรม์ถัดไปกำหนดไว้อย่างไร", a: "C", choices: ["ไม่เกิน 10%", "ไม่เกิน 20%", "ไม่เกิน 30%", "ไม่เกิน 100%"] },
+    { q: "54. ตามแนวทาง Copayment Renewal กรณีเคลมผู้ป่วยในด้วยโรคทั่วไปที่ไม่รวมโรคร้ายแรงและการผ่าตัดใหญ่ ต้องเกิดเงื่อนไขใดร่วมกัน", a: "B", choices: ["เคลม 1 ครั้ง และ Claim Ratio 100%", "เคลมตั้งแต่ 3 ครั้งขึ้นไป และ Claim Ratio ตั้งแต่ 400%", "เคลมตั้งแต่ 5 ครั้ง และ Claim Ratio 200%", "เคลมกี่ครั้งก็ได้ หากค่ารักษาเกิน 50,000 บาท"] },
+    { q: "55. หากผู้เอาประกันภัยเข้าเงื่อนไขทั้งกรณีโรคป่วยเล็กน้อยทั่วไปและกรณีโรคทั่วไป อัตรา Copayment Renewal รวมสูงสุดตามแนวทางเป็นเท่าใด", a: "C", choices: ["ไม่เกิน 30%", "ไม่เกิน 40%", "ไม่เกิน 50%", "ไม่เกิน 60%"] },
+    { q: "56. การพิจารณา Copayment Renewal มีลักษณะใด", a: "B", choices: ["พิจารณาครั้งเดียวและใช้ตลอดชีวิต", "พิจารณาเป็นรายปีตามเงื่อนไขที่กำหนด", "ใช้เฉพาะปีที่ผู้เอาประกันภัยอายุครบ 60 ปี", "ใช้เฉพาะเมื่อผู้รับประโยชน์ร้องขอ"] },
+    { q: "57. ข้อใดเป็นลักษณะของประกันชดเชยรายได้รายวัน", a: "B", choices: ["จ่ายค่ารักษาตามใบเสร็จทุกบาทเสมอ", "จ่ายผลประโยชน์ตามจำนวนต่อวันที่ระบุ เมื่อเข้าเงื่อนไขการพักรักษาตัว", "จ่ายเฉพาะกรณีครบกำหนดสัญญา", "จ่ายเฉพาะกรณีเสียชีวิต"] },
+    { q: "58. ผู้เอาประกันภัยมีประกันชดเชยรายได้วันละ 2,000 บาท และเข้าพักรักษาตัวตามเงื่อนไข 5 วัน จะได้รับผลประโยชน์เท่าใด หากไม่มีเงื่อนไขจำกัดอื่น", a: "D", choices: ["2,000 บาท", "5,000 บาท", "7,000 บาท", "10,000 บาท"] },
+    { q: "59. หากเวนคืนประกันชีวิตแบบสะสมทรัพย์ก่อนครบกำหนด ข้อใดถูกต้องที่สุด", a: "C", choices: ["ได้รับเบี้ยที่ชำระทั้งหมดคืนเสมอ", "ได้รับทุนประกันภัยเต็มจำนวนเสมอ", "ได้รับมูลค่าเวนคืนตามตารางและเงื่อนไขของกรมธรรม์ ซึ่งอาจน้อยกว่าเบี้ยที่ชำระ", "ได้รับเงินครบกำหนดสัญญาทันที"] },
+    { q: "60. ข้อใดเป็นแนวทางการเสนอขายที่ถูกต้องและสอดคล้องกับหลักการคุ้มครองผู้บริโภคมากที่สุด", a: "C", choices: ["บอกลูกค้าว่าประกันสุขภาพคุ้มครองทุกโรคและทุกกรณี", "ไม่จำเป็นต้องอธิบาย Deductible หรือ Copayment เพราะเป็นศัพท์เฉพาะ", "อธิบายความคุ้มครอง เบี้ย ข้อยกเว้น ระยะเวลารอคอย Deductible และ Copayment ให้ครบถ้วนตามเอกสารที่ได้รับอนุมัติ", "รับรองว่าบริษัทจะอนุมัติสินไหมล่วงหน้าทุกกรณี"] }
+];
+
+        const quizForm = document.getElementById('quizForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const resultDiv = document.getElementById('result');
+        const actionContainer = document.getElementById('actionContainer');
+        const nameInput = document.getElementById('name');
+        
+        const certificateWrapper = document.getElementById('certificate-wrapper');
+        const certName = document.getElementById('certName');
+        const certCourseName = document.getElementById('certCourseName');
+        const downloadCertBtn = document.getElementById('downloadCertBtn');
+        const quizHeader = document.getElementById('quizHeader').textContent;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const storedName = urlParams.get('name') || sessionStorage.getItem('user_name');
+            if (storedName) {
+                nameInput.value = storedName;
+            }
+        });
+
+        function renderQuiz() {
+            loading.classList.add('hidden');
+            quizForm.classList.remove('hidden');
+            submitBtn.classList.remove('hidden');
+
+            questions.forEach((q, index) => {
+                const container = document.createElement('div');
+                container.className = 'question-container';
+
+                const questionTitle = document.createElement('h3');
+                questionTitle.textContent = q.q;
+                container.appendChild(questionTitle);
+
+                const ul = document.createElement('ul');
+                ul.className = 'choices';
+
+                q.choices.forEach((choice, i) => {
+                    const li = document.createElement('li');
+                    const label = document.createElement('label');
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `question-${index}`;
+                    input.value = String.fromCharCode(65 + i);
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(` ${input.value}. ${choice}`));
+                    li.appendChild(label);
+                    ul.appendChild(li);
+                });
+
+                container.appendChild(ul);
+                quizForm.appendChild(container);
+            });
+        }
+        
+        async function initialize() {
+            try {
+                const { data: { user }, error } = await supabase.auth.getUser();
+                if (user) currentUser = user;
+            } catch (e) {
+                console.warn("Could not retrieve current user.", e);
+            }
+            renderQuiz();
+        }
+
+        initialize();
+
+        submitBtn.addEventListener('click', async () => {
+            const userNameVal = nameInput.value.trim();
+            if (!userNameVal) {
+                alert("กรุณากรอกชื่อผู้ทำแบบทดสอบก่อนส่งคำตอบครับ");
+                nameInput.focus();
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'กำลังส่งคำตอบ...';
+
+            let score = 0;
+            const answers = [];
+
+            questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="question-${index}"]:checked`);
+                const answer = selected ? selected.value : null; 
+                answers.push(answer);
+                if (answer === q.a) score++;
+            });
+
+            const totalQuestions = questions.length;
+            const percentage = Math.round((score / totalQuestions) * 100);
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || currentUser?.email || "anonymous@example.com";
+            const userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || "ไม่ระบุ";
+
+            try {
+                const { error } = await supabase
+                    .from('quiz_results')
+                    .insert([{
+                        user_email: userEmail,
+                        name: userNameVal,
+                        score: score,
+                        total_questions: totalQuestions,
+                        answers: answers,
+                        experience: userExperience, // <-- เพิ่มคอมม่าตรงนี้เรียบร้อยแล้ว
+                        quiz_set: quizHeader
+                    }]);
+
+                if (error) throw error; 
+
+                if (percentage >= 80) {
+                    resultDiv.innerHTML = `🎉 ยินดีด้วย! คุณสอบผ่าน (${percentage}%) ได้คะแนน ${score} จาก ${totalQuestions} ข้อ`;
+                    resultDiv.style.backgroundColor = '#d1ffd1';
+                    resultDiv.style.color = '#005900';
+                    
+                    certName.textContent = userNameVal;
+                    certCourseName.textContent = quizHeader.replace('แบบทดสอบปรนัย: ', '').replace(/\s*\(.*\)/, '');
+                    
+                    certificateWrapper.style.display = 'block';
+                    quizForm.style.display = 'none';
+                    submitBtn.style.display = 'none';
+                } else {
+                    resultDiv.innerHTML = `❌ คุณได้คะแนน ${score} จาก ${totalQuestions} ข้อ (${percentage}%) ยังไม่ผ่านเกณฑ์ (ต้องได้ 80% ขึ้นไป)`;
+                    resultDiv.style.backgroundColor = '#ffd1d1';
+                    resultDiv.style.color = '#900';
+                    submitBtn.style.display = 'none';
+
+                    const retryBtn = document.createElement('button');
+                    retryBtn.textContent = 'ทำแบบทดสอบใหม่อีกครั้ง';
+                    retryBtn.style.backgroundColor = '#dc3545';
+                    retryBtn.onclick = () => location.reload();
+                    actionContainer.innerHTML = ''; 
+                    actionContainer.appendChild(retryBtn);
+                }
+
+                resultDiv.style.display = 'block';
+
+            } catch (err) {
+                console.error('Error saving quiz result:', err.message || err);
+                resultDiv.textContent = `เกิดข้อผิดพลาดในการบันทึกผล (ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต) กรุณาลองใหม่`;
+                resultDiv.style.backgroundColor = '#ffd1d1';
+                resultDiv.style.color = '#900';
+                resultDiv.style.display = 'block';
+                
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'ส่งคำตอบ';
+            }
+        });
+
+        downloadCertBtn.addEventListener('click', () => {
+            window.print();
+        });
+    </script>
+</body>
+</html>
