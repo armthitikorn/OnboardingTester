@@ -90,87 +90,6 @@
         .hidden {
             display: none;
         }
-        
-        /* สไตล์สำหรับใบประกาศนียบัตรจำลอง */
-        #certificate-wrapper {
-            display: none;
-            text-align: center;
-            margin-top: 40px;
-        }
-        #certificate {
-            background: #fff;
-            border: 15px solid #004080;
-            padding: 15px;
-            text-align: center;
-            border-radius: 4px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            max-width: 800px;
-            margin: 0 auto;
-            position: relative;
-        }
-        .cert-inner {
-            border: 2px solid #d4af37;
-            padding: 50px 30px;
-            background-color: #faf9f5;
-        }
-        .cert-title {
-            color: #d4af37; 
-            font-family: 'Georgia', serif; 
-            font-size: 2.5rem; 
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .cert-name {
-            color: #004080; 
-            font-size: 2rem;
-            border-bottom: 2px solid #004080; 
-            display: inline-block; 
-            padding: 0 40px 5px;
-            margin: 20px 0;
-            font-weight: bold;
-        }
-        
-        @media print {
-            @page {
-                size: A4 landscape;
-                margin: 0mm !important; 
-            }
-            
-            body > *:not(#certificate-wrapper) {
-                display: none !important;
-            }
-
-            #certificate-wrapper {
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100vw !important;
-                height: 100vh !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                background-color: white !important;
-            }
-
-            #certificate {
-                display: block !important;
-                width: 90% !important;
-                max-width: 260mm !important; 
-                margin: auto !important;
-                position: static !important;
-                transform: none !important;
-                box-shadow: none !important;
-                page-break-inside: avoid !important;
-            }
-
-            #certificate-wrapper button, 
-            #certificate-wrapper a {
-                display: none !important;
-            }
-        }
     </style>
 </head>
 <body>
@@ -190,35 +109,6 @@
 
     <div id="result"></div>
     <div id="actionContainer" style="text-align: center; margin-top: 20px;"></div>
-
-    <!-- ส่วนแสดงใบประกาศนียบัตร -->
-    <div id="certificate-wrapper">
-        <div id="certificate">
-            <div class="cert-inner">
-                <h1 class="cert-title">Certificate of Achievement</h1>
-                <p style="font-size: 1.2rem; color: #555; margin-top: 20px;">ขอมอบประกาศนียบัตรฉบับนี้เพื่อให้เกียรติว่า</p>
-                <h2 id="certName" class="cert-name">-</h2>
-                <p style="font-size: 1.2rem; color: #555; margin-top: 10px;">
-                    ได้ผ่านการทดสอบหลักสูตร <br> 
-                    <strong id="certCourseName" style="color: #333; font-size: 1.5rem;">-</strong> <br> 
-                    ด้วยคะแนนที่ผ่านเกณฑ์มาตรฐานอย่างสมบูรณ์
-                </p>
-                <div style="margin-top: 50px; text-align: center;">
-                    <div style="display: inline-block; width: 200px; border-top: 1px solid #333; padding-top: 10px; margin: 0 20px;">
-                        <p style="margin: 0; font-size: 0.9rem;">Prudential Life Assurance</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <button id="downloadCertBtn" style="background-color: #28a745; max-width: 250px; margin: 30px auto;">
-            📥 ดาวน์โหลดใบประกาศ
-        </button>
-        <!-- ลิงก์สิ้นสุดหลักสูตรทั้งหมด -->
-        <a href="index.html" id="nextPageLink" style="text-decoration: none;">
-            <button style="margin-top: 10px; background-color: #28a745; max-width: 250px; margin: 10px auto;">🏠 เสร็จสิ้นหลักสูตร (กลับหน้าหลัก)</button>
-        </a>
-    </div>
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -305,11 +195,6 @@
         const resultDiv = document.getElementById('result');
         const actionContainer = document.getElementById('actionContainer');
         const nameInput = document.getElementById('name');
-        
-        const certificateWrapper = document.getElementById('certificate-wrapper');
-        const certName = document.getElementById('certName');
-        const certCourseName = document.getElementById('certCourseName');
-        const downloadCertBtn = document.getElementById('downloadCertBtn');
         const quizHeader = document.getElementById('quizHeader').textContent;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -403,38 +288,46 @@
                         score: score,
                         total_questions: totalQuestions,
                         answers: answers,
-                        experience: userExperience, // <-- เพิ่มคอมม่าตรงนี้เรียบร้อยแล้ว
+                        experience: userExperience,
                         quiz_set: quizHeader
                     }]);
 
                 if (error) throw error; 
 
-                if (percentage >= 80) {
-                    resultDiv.innerHTML = `🎉 ยินดีด้วย! คุณสอบผ่าน (${percentage}%) ได้คะแนน ${score} จาก ${totalQuestions} ข้อ`;
-                    resultDiv.style.backgroundColor = '#d1ffd1';
-                    resultDiv.style.color = '#005900';
-                    
-                    certName.textContent = userNameVal;
-                    certCourseName.textContent = quizHeader.replace('แบบทดสอบปรนัย: ', '').replace(/\s*\(.*\)/, '');
-                    
-                    certificateWrapper.style.display = 'block';
-                    quizForm.style.display = 'none';
-                    submitBtn.style.display = 'none';
-                } else {
-                    resultDiv.innerHTML = `❌ คุณได้คะแนน ${score} จาก ${totalQuestions} ข้อ (${percentage}%) ยังไม่ผ่านเกณฑ์ (ต้องได้ 80% ขึ้นไป)`;
-                    resultDiv.style.backgroundColor = '#ffd1d1';
-                    resultDiv.style.color = '#900';
-                    submitBtn.style.display = 'none';
+                // --- กำหนดระดับความรู้ตามช่วงคะแนน ---
+                let levelName = "";
+                let boxBgColor = "";
+                let boxTextColor = "";
 
-                    const retryBtn = document.createElement('button');
-                    retryBtn.textContent = 'ทำแบบทดสอบใหม่อีกครั้ง';
-                    retryBtn.style.backgroundColor = '#dc3545';
-                    retryBtn.onclick = () => location.reload();
-                    actionContainer.innerHTML = ''; 
-                    actionContainer.appendChild(retryBtn);
+                if (score <= 39) {
+                    levelName = "เริ่มต้น";
+                    boxBgColor = '#fff3cd'; 
+                    boxTextColor = '#856404';
+                } else if (score >= 40 && score <= 54) {
+                    levelName = "มาตรฐาน";
+                    boxBgColor = '#d1ecf1'; 
+                    boxTextColor = '#0c5460';
+                } else {
+                    levelName = "ผู้เชี่ยวชาญ";
+                    boxBgColor = '#d1ffd1'; 
+                    boxTextColor = '#005900';
                 }
 
+                // แสดงผลลัพธ์และระดับความรู้ (มีปุ่มทำใหม่อีกครั้งเสมอ)
+                resultDiv.innerHTML = `📊 ผลการประเมินของคุณ: ระดับ <strong>${levelName}</strong><br>ได้คะแนน ${score} จาก ${totalQuestions} ข้อ (${percentage}%)`;
+                resultDiv.style.backgroundColor = boxBgColor;
+                resultDiv.style.color = boxTextColor;
                 resultDiv.style.display = 'block';
+
+                quizForm.style.display = 'none';
+                submitBtn.style.display = 'none';
+
+                const retryBtn = document.createElement('button');
+                retryBtn.textContent = 'ทำแบบทดสอบใหม่อีกครั้ง';
+                retryBtn.style.backgroundColor = '#007acc';
+                retryBtn.onclick = () => location.reload();
+                actionContainer.innerHTML = ''; 
+                actionContainer.appendChild(retryBtn);
 
             } catch (err) {
                 console.error('Error saving quiz result:', err.message || err);
@@ -446,10 +339,6 @@
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'ส่งคำตอบ';
             }
-        });
-
-        downloadCertBtn.addEventListener('click', () => {
-            window.print();
         });
     </script>
 </body>
