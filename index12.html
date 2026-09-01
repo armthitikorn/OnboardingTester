@@ -279,7 +279,27 @@
             const userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || currentUser?.email || "anonymous@example.com";
             const userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || "ไม่ระบุ";
 
+            // --- กำหนดระดับความรู้ตามช่วงคะแนน ---
+            let levelName = "";
+            let boxBgColor = "";
+            let boxTextColor = "";
+
+            if (score <= 39) {
+                levelName = "เริ่มต้น";
+                boxBgColor = '#fff3cd'; 
+                boxTextColor = '#856404';
+            } else if (score >= 40 && score <= 54) {
+                levelName = "มาตรฐาน";
+                boxBgColor = '#d1ecf1'; 
+                boxTextColor = '#0c5460';
+            } else {
+                levelName = "ผู้เชี่ยวชาญ";
+                boxBgColor = '#d1ffd1'; 
+                boxTextColor = '#005900';
+            }
+
             try {
+                // บันทึกข้อมูลรวมถึงฟิลด์ level ลงใน Supabase
                 const { error } = await supabase
                     .from('quiz_results')
                     .insert([{
@@ -289,31 +309,13 @@
                         total_questions: totalQuestions,
                         answers: answers,
                         experience: userExperience,
-                        quiz_set: quizHeader
+                        quiz_set: quizHeader,
+                        level: levelName // ส่งค่าระดับความรู้ไปบันทึก
                     }]);
 
                 if (error) throw error; 
 
-                // --- กำหนดระดับความรู้ตามช่วงคะแนน ---
-                let levelName = "";
-                let boxBgColor = "";
-                let boxTextColor = "";
-
-                if (score <= 39) {
-                    levelName = "เริ่มต้น";
-                    boxBgColor = '#fff3cd'; 
-                    boxTextColor = '#856404';
-                } else if (score >= 40 && score <= 54) {
-                    levelName = "มาตรฐาน";
-                    boxBgColor = '#d1ecf1'; 
-                    boxTextColor = '#0c5460';
-                } else {
-                    levelName = "ผู้เชี่ยวชาญ";
-                    boxBgColor = '#d1ffd1'; 
-                    boxTextColor = '#005900';
-                }
-
-                // แสดงผลลัพธ์และระดับความรู้ (มีปุ่มทำใหม่อีกครั้งเสมอ)
+                // แสดงผลลัพธ์และระดับความรู้หน้าจอผู้สอบ
                 resultDiv.innerHTML = `📊 ผลการประเมินของคุณ: ระดับ <strong>${levelName}</strong><br>ได้คะแนน ${score} จาก ${totalQuestions} ข้อ (${percentage}%)`;
                 resultDiv.style.backgroundColor = boxBgColor;
                 resultDiv.style.color = boxTextColor;
