@@ -324,12 +324,17 @@
                 quizForm.style.display = 'none';
                 submitBtn.style.display = 'none';
 
-                const retryBtn = document.createElement('button');
-                retryBtn.textContent = 'ทำแบบทดสอบใหม่อีกครั้ง';
-                retryBtn.style.backgroundColor = '#007acc';
-                retryBtn.onclick = () => location.reload();
-                actionContainer.innerHTML = ''; 
-                actionContainer.appendChild(retryBtn);
+// 📌 เปลี่ยนจากปุ่มทำใหม่ เป็นปุ่มพาไปทำข้อสอบอัตนัย (Index 13)
+const nextBtn = document.createElement('button');
+nextBtn.textContent = '✍️ ไปทำข้อสอบอัตนัย (ชุดถัดไป)';
+nextBtn.style.backgroundColor = '#8b5cf6'; // ใช้สีม่วงเพื่อให้แตกต่าง
+nextBtn.onclick = () => {
+    // ส่งชื่อและอีเมลติดตัวไปกับ URL ของหน้าข้อสอบอัตนัย (สามารถเปลี่ยนชื่อไฟล์ subjective.html เป็นหน้าอัตนัยของคุณได้เลยครับ)
+    const targetUrl = `subjective.html?name=${encodeURIComponent(userNameVal)}&email=${encodeURIComponent(userEmail)}&experience=${encodeURIComponent(userExperience)}`;
+    window.location.href = targetUrl;
+};
+actionContainer.innerHTML = ''; 
+actionContainer.appendChild(nextBtn);
 
             } catch (err) {
                 console.error('Error saving quiz result:', err.message || err);
