@@ -330,8 +330,8 @@ nextBtn.textContent = '✍️ ไปทำข้อสอบอัตนัย (
 nextBtn.style.backgroundColor = '#8b5cf6'; // ใช้สีม่วงเพื่อให้แตกต่าง
 nextBtn.onclick = () => {
     // ส่งชื่อและอีเมลติดตัวไปกับ URL ของหน้าข้อสอบอัตนัย (สามารถเปลี่ยนชื่อไฟล์ subjective.html เป็นหน้าอัตนัยของคุณได้เลยครับ)
-    const targetUrl = `subjective.html?name=${encodeURIComponent(userNameVal)}&email=${encodeURIComponent(userEmail)}&experience=${encodeURIComponent(userExperience)}`;
-    window.location.href = targetUrl;
+const targetUrl = `index13.html?name=${encodeURIComponent(userNameVal)}&email=${encodeURIComponent(userEmail)}&experience=${encodeURIComponent(userExperience)}`;
+window.location.href = targetUrl;
 };
 actionContainer.innerHTML = ''; 
 actionContainer.appendChild(nextBtn);
