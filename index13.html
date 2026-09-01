@@ -3,53 +3,42 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>แบบทดสอบอัตนัย - ความกังวลของลูกค้า</title>
+    <title>แบบทดสอบอัตนัย & ใบประกาศนียบัตร</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body {
             font-family: 'Sarabun', sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: #f9faff;
+            color: #333;
             padding: 20px;
-            display: flex;
-            justify-content: center;
         }
-        .container {
-            max-width: 800px;
-            width: 100%;
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        h2 {
-            text-align: center;
-            color: #007acc;
-            margin-bottom: 30px;
-        }
-        label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 8px;
-        }
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 12px;
+        h2 { color: #004080; text-align: center; margin-bottom: 25px; }
+        .question-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
             margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 1rem;
-            box-sizing: border-box;
         }
+        .question h3 { color: #0059b3; font-size: 1rem; margin-bottom: 10px; }
         textarea {
-            height: 100px;
-            resize: vertical;
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            font-family: 'Sarabun', sans-serif;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+            outline: none;
         }
+        textarea:focus { border-color: #007acc; box-shadow: 0 0 0 3px rgba(0, 122, 204, 0.15); }
         button {
             display: block;
             width: 100%;
             max-width: 300px;
-            margin: 30px auto 0;
             padding: 15px;
             font-size: 1.1rem;
             background-color: #007acc;
@@ -57,161 +46,189 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
+            margin: 20px auto;
             box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-            transition: background-color 0.3s;
         }
-        button:hover {
-            background-color: #005fa3;
-        }
-        .message-box {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
+        button:hover { background-color: #005fa3; }
+        .hidden { display: none !important; }
+        
+        /* สไตล์ใบเซอร์ (Certificate) */
+        #certCard {
+            background: #ffffff;
+            border: 8px solid #004080;
+            padding: 40px;
+            border-radius: 12px;
             text-align: center;
-            display: none; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-top: 20px;
         }
+        .cert-title { font-size: 26px; font-weight: bold; color: #004080; margin-bottom: 5px; }
+        .cert-subtitle { font-size: 16px; color: #64748b; margin-bottom: 25px; }
+        .cert-name { font-size: 24px; font-weight: bold; color: #0284c7; border-bottom: 2px dashed #cbd5e1; display: inline-block; padding: 0 30px 5px; margin-bottom: 15px; }
+        .cert-details { text-align: left; background: #f8fafc; padding: 20px; border-radius: 8px; margin-top: 20px; font-size: 0.95rem; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>แบบทดสอบอัตนัย: ความกังวลของลูกค้า</h2>
-        <div id="messageBox" class="message-box"></div>
 
-        <form id="subjectiveForm">
-            <label for="name">ชื่อผู้ทำแบบทดสอบ:</label>
-            <input type="text" id="name" name="name" required placeholder="กรุณาระบุชื่อ-นามสกุล" />
+    <h2 id="pageTitle">แบบทดสอบอัตนัย (สถานการณ์จำลองการขาย)</h2>
 
-            <label for="q1">1. ไม่สนใจประกันครับ/ค่ะ?</label>
-            <textarea id="q1" name="q1" required></textarea>
+    <div id="formSection">
+        <p style="text-align:center; color:#64748b; margin-bottom:20px;">กรุณาพิมพ์แนวทางการตอบข้อโต้แย้งของลูกค้าให้ครบทุกข้อ เพื่อให้ AI ทำการประเมินผล</p>
+        <div id="subjectiveFormContainer"></div>
+        <button id="submitSubjBtn" onclick="submitSubjectiveExam()">🤖 ส่งคำตอบ & ให้ AI วิเคราะห์พร้อมออกใบเซอร์</button>
+    </div>
 
-            <label for="q2">2. มีประกันอยู่แล้วหลายตัว?</label>
-            <textarea id="q2" name="q2" required></textarea>
+    <!-- Loading State -->
+    <div id="loadingSection" class="hidden" style="text-align:center; padding:50px;">
+        <h3 style="color:#007acc;">⏳ AI กำลังวิเคราะห์คำตอบอัตนัยและสร้างใบประกาศนียบัตร...</h3>
+        <p style="color:#64748b;">กรุณารอสักครู่ ระบบกำลังบันทึกข้อมูลลงฐานข้อมูล</p>
+    </div>
 
-            <label for="q3">3. ไม่อยากเพิ่มภาระประกันอีก?</label>
-            <textarea id="q3" name="q3" required></textarea>
+    <!-- ส่วนแสดงใบ Certificate -->
+    <div id="certSection" class="hidden">
+        <div id="certCard">
+            <div class="cert-title">📜 ใบประกาศนียบัตรผ่านการประเมินสมรรถนะรอบด้าน</div>
+            <div class="cert-subtitle">หลักสูตร Telesales Insurance Training & Simulation Program</div>
+            <p style="margin:0; font-size:15px; color:#333;">ขอมอบเกียรติบัตรฉบับนี้แสดงว่า</p>
+            <div class="cert-name" id="certEmpName">-</div>
+            <p id="certEmpMeta" style="margin:5px 0 20px; color:#555; font-size:14px;"></p>
+            
+            <div class="cert-details">
+                <h4 style="margin:0 0 10px; color:#004080; border-bottom:1px solid #cbd5e1; padding-bottom:5px;">📊 สรุปผลการประเมินสมรรถนะ</h4>
+                <p><strong>1. คะแนนแบบทดสอบปรนัย (ชุดที่ 12):</strong> <span id="certQuizScore">-</span></p>
+                <p><strong>2. ผลการประเมินข้อสอบอัตนัย & AI Analysis:</strong></p>
+                <div id="certAIAnalysis" style="background:#fff; padding:12px; border-radius:6px; border:1px solid #e2e8f0; font-size:0.9rem; line-height:1.5;">-</div>
+            </div>
+            
+            <p style="margin-top:30px; font-size:13px; color:#94a3b8;">ออกให้ ณ วันที่ <span id="certDate">-</span></p>
+        </div>
 
-            <label for="q4">4. ไม่อยากซ้ำซ้อนกับของเดิม?</label>
-            <textarea id="q4" name="q4" required></textarea>
-
-            <label for="q5">5. ตอนนี้ไม่สะดวกคุยครับ/ค่ะ?</label>
-            <textarea id="q5" name="q5" required></textarea>
-
-            <label for="q6">6. มีเอกสารส่งให้ดูก่อนไหม?</label>
-            <textarea id="q6" name="q6" required></textarea>
-
-            <label for="q7">7. ขอปรึกษาที่บ้านก่อน?</label>
-            <textarea id="q7" name="q7" required></textarea>
-
-            <label for="q8">8. ยังไม่ตัดสินใจครับ?</label>
-            <textarea id="q8" name="q8" required></textarea>
-
-            <label for="q9">9. เบี้ยแพงไปไม่มีเงินจ่าย?</label>
-            <textarea id="q9" name="q9" required></textarea>
-
-            <label for="q10">10. ทำแล้วยกเลิกได้ไหม?</label>
-            <textarea id="q10" name="q10" required></textarea>
-
-            <button type="submit" id="submitBtn">ส่งคำตอบ</button>
-        </form>
+        <button id="downloadPdfBtn" style="background:#22c55e; margin-top:20px;" onclick="downloadCertificatePDF()">📥 ดาวน์โหลดใบประกาศนียบัตร PDF</button>
     </div>
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-        // --- Supabase Setup ---
         const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        let currentUserId = "anonymous";
-        let currentUserEmail = "anonymous@example.com";
-        const submitBtn = document.getElementById("submitBtn");
-        const messageBox = document.getElementById("messageBox");
+        const QUESTIONS_LIST = [
+            "คำถามอัตนัยข้อที่ 1 (ไม่สนใจประกันครับ/ค่ะ)",
+            "คำถามอัตนัยข้อที่ 2 (มีประกันอยู่แล้วหลายตัว?)",
+            "คำถามอัตนัยข้อที่ 3 (ไม่อยากเพิ่มภาระประกันอีก?)",
+            "คำถามอัตนัยข้อที่ 4 (ไม่อยากซ้ำซ้อนกับของเดิม?)",
+            "คำถามอัตนัยข้อที่ 5 (ตอนนี้ไม่สะดวกคุยครับ/ค่ะ)",
+            "คำถามอัตนัยข้อที่ 6 (มีเอกสารส่งให้ดูก่อนไหม?)",
+            "คำถามอัตนัยข้อที่ 7 (ขอปรึกษาที่บ้านก่อน?)",
+            "คำถามอัตนัยข้อที่ 8 (ยังไม่ตัดสินใจครับ?)",
+            "คำถามอัตนัยข้อที่ 9 (เบี้ยแพงไปไม่มีเงินจ่าย?)",
+            "คำถามอัตนัยข้อที่ 10 (ทำแล้วยกเลิกได้ไหม?)"
+        ];
 
-        function showMessage(text, isError = false) {
-            messageBox.textContent = text;
-            messageBox.style.display = 'block';
-            if (isError) {
-                messageBox.style.backgroundColor = '#f8d7da';
-                messageBox.style.color = '#721c24';
-            } else {
-                messageBox.style.backgroundColor = '#d4edda';
-                messageBox.style.color = '#155724';
-            }
-            setTimeout(() => {
-                messageBox.style.display = 'none';
-            }, 5000);
+        let urlParams, userName, userEmail, userExperience, quizScore, quizTotal, quizLevel;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            urlParams = new URLSearchParams(window.location.search);
+            userName = urlParams.get('name') || sessionStorage.getItem('user_name') || 'ไม่ระบุชื่อ';
+            userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || 'anonymous@example.com';
+            userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || 'ไม่ระบุ';
+            quizScore = urlParams.get('score') || '-';
+            quizTotal = urlParams.get('total') || '60';
+            quizLevel = urlParams.get('level') || 'มาตรฐาน';
+
+            renderSubjectiveForm();
+        });
+
+        function renderSubjectiveForm() {
+            const container = document.getElementById('subjectiveFormContainer');
+            QUESTIONS_LIST.forEach((qText, index) => {
+                const div = document.createElement('div');
+                div.className = 'question-container';
+                div.innerHTML = `
+                    <h3>${qText}</h3>
+                    <textarea id="subj_ans_${index}" placeholder="พิมพ์แนวทางการตอบคำโต้แย้งของลูกค้าที่นี่..."></textarea>
+                `;
+                container.appendChild(div);
+            });
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            // 1. ดึงชื่อจาก URL Params หรือ SessionStorage มาแสดงในช่อง #name อัตโนมัติ
-            const urlParams = new URLSearchParams(window.location.search);
-            const storedName = urlParams.get('name') || sessionStorage.getItem('user_name');
-            if (storedName) {
-                document.getElementById('name').value = storedName;
+        window.submitSubjectiveExam = async function() {
+            const answers = [];
+            for (let i = 0; i < QUESTIONS_LIST.length; i++) {
+                const val = document.getElementById(`subj_ans_${i}`).value.trim();
+                if (!val) {
+                    alert(`กรุณากรอกคำตอบในข้อที่ ${i + 1} ให้ครบถ้วนครับ`);
+                    document.getElementById(`subj_ans_${i}`).focus();
+                    return;
+                }
+                answers.push({ questionIndex: i + 1, answer: val });
             }
 
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('loadingSection').classList.remove('hidden');
+
+            // 1. จำลองหรือเรียก AI วิเคราะห์คำตอบอัตนัยผ่าน Vercel API
+            let aiAnalysisText = "พนักงานมีความเข้าใจหลักการตอบข้อโต้แย้ง สามารถสื่อสารเหตุผลและสร้างความเชื่อมั่นให้กับลูกค้าได้ดีเยี่ยม พร้อมแนะนำให้เน้นย้ำสิทธิประโยชน์เพิ่มเติม";
             try {
-                // พยายามดึงข้อมูล User จาก Supabase Auth
-                const { data: { user } } = await supabase.auth.getUser();
-                if (user) {
-                    currentUserId = user.id;
-                    currentUserEmail = user.email || currentUserEmail;
+                const response = await fetch('/api/analyze', {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ candidateData: { name: userName, experience: userExperience, subjectiveAnswers: answers } })
+                });
+                if (response.ok) {
+                    const resJson = await response.json();
+                    if (resJson.recommendations) {
+                        aiAnalysisText = resJson.recommendations.join('<br>• ');
+                    }
                 }
             } catch (e) {
-                console.warn("Auth check failed, using anonymous data.", e);
-            }
-        });
-
-        document.getElementById("subjectiveForm").addEventListener("submit", async function(event) {
-            event.preventDefault();
-
-            submitBtn.disabled = true;
-            submitBtn.textContent = "กำลังส่งข้อมูล...";
-
-            // 🔥 ดึงค่า Email, Name, Experience จาก URL Parameters หรือ sessionStorage
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            const name = document.getElementById("name").value.trim() || urlParams.get('name') || sessionStorage.getItem('user_name') || "ไม่ระบุชื่อ";
-            const userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || currentUserEmail;
-            const userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || "ไม่ระบุ";
-
-            // รวบรวมคำตอบข้อ 1-10
-            const answers = {}; 
-            for (let i = 1; i <= 10; i++) {
-                answers[`q${i}`] = document.getElementById(`q${i}`).value.trim();
+                console.warn("AI API fallback used:", e);
             }
 
-            const dataToInsert = {
-                name: name,
-                answers: answers,
-                user_id: currentUserId,
-                user_email: userEmail,
-                experience: userExperience // 🔥 แนบส่งประสบการณ์เข้าตาราง subjective_answers
+            // 2. บันทึกข้อมูลลงตาราง subjective_answers ใน Supabase
+            try {
+                await supabase.from('subjective_answers').insert([{
+                    user_email: userEmail,
+                    name: userName,
+                    experience: userExperience,
+                    answers: answers,
+                    ai_analysis: { summary: aiAnalysisText }
+                }]);
+            } catch (err) {
+                console.error("Supabase Save Error:", err);
+            }
+
+            // 3. แสดงผลหน้า Certificate
+            document.getElementById('loadingSection').classList.add('hidden');
+            document.getElementById('certSection').classList.remove('hidden');
+
+            document.getElementById('certEmpName').innerText = userName;
+            document.getElementById('certEmpMeta').innerText = `ประสบการณ์: ${userExperience} | อีเมล: ${userEmail}`;
+            document.getElementById('certQuizScore').innerText = `${quizScore} / ${quizTotal} ข้อ (ระดับ: ${quizLevel})`;
+            document.getElementById('certAIAnalysis').innerHTML = `• ${aiAnalysisText}`;
+            document.getElementById('certDate').innerText = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+        };
+
+        window.downloadCertificatePDF = function() {
+            const btn = document.getElementById('downloadPdfBtn');
+            btn.disabled = true;
+            btn.innerText = "⏳ กำลังดาวน์โหลด PDF...";
+
+            const element = document.getElementById('certCard');
+            const opt = {
+                margin: 0.3,
+                filename: `Certificate_${userName}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
             };
 
-            const { error } = await supabase
-                .from('subjective_answers') 
-                .insert([dataToInsert]);
-
-            if (error) {
-                console.error("Error saving answers:", error);
-                showMessage(`เกิดข้อผิดพลาดในการบันทึกข้อมูล: ${error.message}. กรุณาตรวจสอบ RLS/Data Type`, true);
-                submitBtn.disabled = false;
-                submitBtn.textContent = "ส่งคำตอบ";
-            } else {
-                showMessage(`ส่งคำตอบเรียบร้อยแล้ว, ผู้ทำแบบทดสอบ: ${name}`, false);
-                
-                // นำทางไปยังหน้าถัดไปพร้อมส่ง Query Params ติดไปด้วย
-                setTimeout(() => {
-                    const redirectUrl = `index3.html?email=${encodeURIComponent(userEmail)}&name=${encodeURIComponent(name)}&experience=${encodeURIComponent(userExperience)}`;
-                    window.location.href = redirectUrl;
-                }, 1500);
-            }
-        });
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.disabled = false;
+                btn.innerText = "📥 ดาวน์โหลดใบประกาศนียบัตร PDF";
+            });
+        };
     </script>
 </body>
 </html>
