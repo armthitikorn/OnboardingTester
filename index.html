@@ -109,7 +109,38 @@
           sessionStorage.setItem('user_experience', experience);
           sessionStorage.setItem('login_time', loginTime); // <-- บันทึกเวลาที่นี่
 
-          // 3. ตรวจสอบและบันทึกลงตาราง users ใน Supabase พร้อมเวลา (login_time)
+          // 3. ตรวจสอบและบันทึกลงตาราง users ใน Supabase พร้อมแนบค่า department ไปด้วย
+          const { data: userData, error: fetchError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', email)
+            .maybeSingle();
+
+          if (fetchError) console.error('Error fetching user:', fetchError);
+
+          if (userData) {
+            await supabase
+              .from('users')
+              .update({ 
+                full_name: name, 
+                emp_code: empCode, 
+                department: department, // 📌 เพิ่มแผนกตรงนี้
+                experience: experience,
+                login_time: loginTime 
+              })
+              .eq('email', email);
+          } else {
+            await supabase
+              .from('users')
+              .insert([{ 
+                email, 
+                full_name: name, 
+                emp_code: empCode, 
+                department: department, // 📌 และเพิ่มแผนกตรงนี้ด้วยครับ
+                experience, 
+                login_time: loginTime 
+              }]);
+          }   // 3. ตรวจสอบและบันทึกลงตาราง users ใน Supabase พร้อมเวลา (login_time)
           const { data: userData, error: fetchError } = await supabase
             .from('users')
             .select('*')
