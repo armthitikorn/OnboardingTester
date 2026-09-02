@@ -98,84 +98,58 @@
         showMessage('กำลังบันทึกข้อมูลและเวลา...', false);
 
         try {
-          // 1. สร้างตัวแปรเก็บเวลาปัจจุบันในรูปแบบมาตรฐาน (ISO String)
           const loginTime = new Date().toISOString();
 
-          // 2. บันทึกข้อมูลและเวลาลงใน Session Storage
+          // 1. บันทึกข้อมูลลงใน Session Storage
           sessionStorage.setItem('user_email', email);
           sessionStorage.setItem('user_name', name);
           sessionStorage.setItem('emp_code', empCode);
           sessionStorage.setItem('department', department);
           sessionStorage.setItem('user_experience', experience);
-          sessionStorage.setItem('login_time', loginTime); // <-- บันทึกเวลาที่นี่
+          sessionStorage.setItem('login_time', loginTime);
 
-          // 3. ตรวจสอบและบันทึกลงตาราง users ใน Supabase พร้อมแนบค่า department ไปด้วย
+          // 2. ตรวจสอบและบันทึก/อัปเดตลงตาราง users ใน Supabase (รอบเดียวจบ ไม่ซ้ำซ้อน)
           const { data: userData, error: fetchError } = await supabase
             .from('users')
             .select('*')
             .eq('email', email)
             .maybeSingle();
 
-          if (fetchError) console.error('Error fetching user:', fetchError);
+          if (fetchError) {
+            console.error('Error fetching user:', fetchError);
+          }
 
           if (userData) {
-            await supabase
-              .from('users')
-              .update({ 
-                full_name: name, 
-                emp_code: empCode, 
-                department: department, // 📌 เพิ่มแผนกตรงนี้
-                experience: experience,
-                login_time: loginTime 
-              })
-              .eq('email', email);
-          } else {
-            await supabase
-              .from('users')
-              .insert([{ 
-                email, 
-                full_name: name, 
-                emp_code: empCode, 
-                department: department, // 📌 และเพิ่มแผนกตรงนี้ด้วยครับ
-                experience, 
-                login_time: loginTime 
-              }]);
-          }   // 3. ตรวจสอบและบันทึกลงตาราง users ใน Supabase พร้อมเวลา (login_time)
-          const { data: userData, error: fetchError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('email', email)
-            .maybeSingle();
-
-          if (fetchError) console.error('Error fetching user:', fetchError);
-
-          if (userData) {
-            await supabase
+            const { error: updateError } = await supabase
               .from('users')
               .update({ 
                 full_name: name, 
                 emp_code: empCode, 
                 department: department, 
                 experience: experience,
-                login_time: loginTime // อัปเดตเวลาเข้าสู่ระบบล่าสุด
+                login_time: loginTime 
               })
               .eq('email', email);
+
+            if (updateError) throw updateError;
           } else {
-            await supabase
+            const { error: insertError } = await supabase
               .from('users')
               .insert([{ 
-                email, 
+                email: email, 
                 full_name: name, 
                 emp_code: empCode, 
-                department, 
-                experience,
-                login_time: loginTime // บันทึกเวลาเข้าสู่ระบบครั้งแรก
+                department: department, 
+                experience: experience,
+                login_time: loginTime 
               }]);
+
+            if (insertError) throw insertError;
           }
 
           showMessage('บันทึกข้อมูลเรียบร้อย! กำลังพาเข้าสู่แบบทดสอบ...', false);
 
-          // 4. พาไปยังหน้าแบบทดสอบพร้อมแนบตัวแปรเวลา (loginTime) ไปทาง URL Parameters ด้วย
+          // 3. พาไปยังหน้าแบบทดสอบพร้อมแนบตัวแปรไปทาง URL Parameters
           setTimeout(() => {
             const redirectUrl = `${selectedQuizFile}?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&experience=${encodeURIComponent(experience)}&dept=${encodeURIComponent(department)}&login_time=${encodeURIComponent(loginTime)}`;
             window.location.href = redirectUrl;
@@ -183,7 +157,7 @@
 
         } catch (err) {
           console.error('Unexpected error:', err);
-          showMessage(`เกิดข้อผิดพลาด: ${err.message}`, true);
+          showMessage(`เกิดข้อผิดพลาดในการบันทึก: ${err.message}`, true);
         }
       });
     });
