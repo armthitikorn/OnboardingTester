@@ -127,8 +127,9 @@
         ];
 
         let urlParams, userName, userEmail, userExperience, quizScore, quizTotal, quizLevel;
+        let currentUserId = "anonymous";
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             urlParams = new URLSearchParams(window.location.search);
             userName = urlParams.get('name') || sessionStorage.getItem('user_name') || 'ไม่ระบุชื่อ';
             userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || 'anonymous@example.com';
@@ -136,6 +137,17 @@
             quizScore = urlParams.get('score') || '-';
             quizTotal = urlParams.get('total') || '60';
             quizLevel = urlParams.get('level') || 'มาตรฐาน';
+
+            // 🔥 พยายามดึง user_id จาก Supabase Auth (แนวทางเดียวกับ index2.html)
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    currentUserId = user.id;
+                    userEmail = user.email || userEmail;
+                }
+            } catch (e) {
+                console.warn("Auth check failed, using anonymous data.", e);
+            }
 
             renderSubjectiveForm();
         });
@@ -154,7 +166,9 @@
         }
 
         window.submitSubjectiveExam = async function() {
-            const answers = [];
+            // 🔥 เปลี่ยนโครงสร้าง answers เป็น object {q1:"...", q2:"...", ...}
+            // เพื่อให้ตรงกับรูปแบบข้อมูลจริงใน Supabase (แนวทางเดียวกับ index2.html)
+            const answers = {};
             for (let i = 0; i < QUESTIONS_LIST.length; i++) {
                 const val = document.getElementById(`subj_ans_${i}`).value.trim();
                 if (!val) {
@@ -162,19 +176,24 @@
                     document.getElementById(`subj_ans_${i}`).focus();
                     return;
                 }
-                answers.push({ questionIndex: i + 1, answer: val });
+                answers[`q${i + 1}`] = val;
             }
 
             document.getElementById('formSection').classList.add('hidden');
             document.getElementById('loadingSection').classList.remove('hidden');
 
             // 1. จำลองหรือเรียก AI วิเคราะห์คำตอบอัตนัยผ่าน Vercel API
+            // (แปลงกลับเป็น array ชั่วคราวเฉพาะตอนส่งให้ AI วิเคราะห์ เพื่อความเข้ากันได้กับ API เดิม)
+            const answersForAI = Object.keys(answers).map((key, idx) => ({
+                questionIndex: idx + 1,
+                answer: answers[key]
+            }));
             let aiAnalysisText = "พนักงานมีความเข้าใจหลักการตอบข้อโต้แย้ง สามารถสื่อสารเหตุผลและสร้างความเชื่อมั่นให้กับลูกค้าได้ดีเยี่ยม พร้อมแนะนำให้เน้นย้ำสิทธิประโยชน์เพิ่มเติม";
             try {
                 const response = await fetch('/api/analyze', {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ candidateData: { name: userName, experience: userExperience, subjectiveAnswers: answers } })
+                    body: JSON.stringify({ candidateData: { name: userName, experience: userExperience, subjectiveAnswers: answersForAI } })
                 });
                 if (response.ok) {
                     const resJson = await response.json();
@@ -187,8 +206,10 @@
             }
 
             // 2. บันทึกข้อมูลลงตาราง subjective_answers ใน Supabase
+            // 🔥 เพิ่ม user_id และเปลี่ยน answers เป็น object {q1:...,q2:...} ให้ตรงกับ index2.html
             try {
                 await supabase.from('subjective_answers').insert([{
+                    user_id: currentUserId,
                     user_email: userEmail,
                     name: userName,
                     experience: userExperience,
