@@ -206,18 +206,23 @@
             }
 
             // 2. บันทึกข้อมูลลงตาราง subjective_answers ใน Supabase
-            // 🔥 เพิ่ม user_id และเปลี่ยน answers เป็น object {q1:...,q2:...} ให้ตรงกับ index2.html
-            try {
-                await supabase.from('subjective_answers').insert([{
-                    user_id: currentUserId,
-                    user_email: userEmail,
-                    name: userName,
-                    experience: userExperience,
-                    answers: answers,
-                    ai_analysis: { summary: aiAnalysisText }
-                }]);
-            } catch (err) {
-                console.error("Supabase Save Error:", err);
+            // 🔥 แก้บั๊กสำคัญ: Supabase ไม่ throw error แบบ JS ปกติ ต้องดึงค่า error ออกมาเช็คเอง
+            // (เดิม try/catch เฉยๆ จะไม่มีวันจับ error ของ Supabase ได้ ทำให้ดูเหมือนสำเร็จทั้งที่จริงไม่ได้บันทึก)
+            const { error: saveError } = await supabase.from('subjective_answers').insert([{
+                user_id: currentUserId,
+                user_email: userEmail,
+                name: userName,
+                experience: userExperience,
+                answers: answers,
+                ai_analysis: { summary: aiAnalysisText }
+            }]);
+
+            if (saveError) {
+                console.error("Supabase Save Error:", saveError);
+                document.getElementById('loadingSection').classList.add('hidden');
+                alert(`เกิดข้อผิดพลาดในการบันทึกข้อมูล: ${saveError.message}\n\nกรุณาแจ้งผู้ดูแลระบบพร้อมข้อความนี้`);
+                document.getElementById('formSection').classList.remove('hidden');
+                return;
             }
 
             // 3. แสดงผลหน้า Certificate
