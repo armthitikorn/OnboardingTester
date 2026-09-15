@@ -136,8 +136,9 @@ const QUESTIONS_LIST = [
     "คำถามอัตนัยข้อที่ 20 (กลัวว่าจ่ายเบี้ยหลายปีแล้ววันหนึ่งขาดส่ง เงินที่จ่ายไปทั้งหมดจะสูญเปล่าไหม?)"
 ];
 
-        let urlParams, userName, userEmail, userExperience, quizScore, quizTotal, quizLevel;
-        let currentUserId = "anonymous";
+let urlParams, userName, userEmail, userExperience, quizScore, quizTotal, quizLevel;
+let currentUserId = "anonymous";
+let currentSessionId = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
             urlParams = new URLSearchParams(window.location.search);
@@ -147,6 +148,10 @@ const QUESTIONS_LIST = [
             quizScore = urlParams.get('score') || '-';
             quizTotal = urlParams.get('total') || '60';
             quizLevel = urlParams.get('level') || 'มาตรฐาน';
+
+// 🔑 รับ session_id ต่อจากหน้าปรนัย ถ้าไม่มี (เข้าหน้านี้ตรง ๆ) ให้สร้างใหม่
+currentSessionId = urlParams.get('session') || sessionStorage.getItem('current_test_session') || crypto.randomUUID();
+sessionStorage.setItem('current_test_session', currentSessionId);
 
             // 🔥 พยายามดึง user_id จาก Supabase Auth (แนวทางเดียวกับ index2.html)
             try {
@@ -218,15 +223,15 @@ const QUESTIONS_LIST = [
             // 2. บันทึกข้อมูลลงตาราง subjective_answers ใน Supabase
             // 🔥 แก้บั๊กสำคัญ: Supabase ไม่ throw error แบบ JS ปกติ ต้องดึงค่า error ออกมาเช็คเอง
             // (เดิม try/catch เฉยๆ จะไม่มีวันจับ error ของ Supabase ได้ ทำให้ดูเหมือนสำเร็จทั้งที่จริงไม่ได้บันทึก)
-            const { error: saveError } = await supabase.from('subjective_answers').insert([{
-                user_id: currentUserId,
-                user_email: userEmail,
-                name: userName,
-                experience: userExperience,
-                answers: answers,
-                ai_analysis: { summary: aiAnalysisText }
-            }]);
-
+const { error: saveError } = await supabase.from('subjective_answers').insert([{
+    user_id: currentUserId,
+    user_email: userEmail,
+    name: userName,
+    experience: userExperience,
+    answers: answers,
+    ai_analysis: { summary: aiAnalysisText },
+    session_id: currentSessionId   // ✅ เพิ่มบรรทัดนี้
+}]);
             if (saveError) {
                 console.error("Supabase Save Error:", saveError);
                 document.getElementById('loadingSection').classList.add('hidden');
