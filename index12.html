@@ -227,13 +227,17 @@ let currentSessionId = null;
         const nameInput = document.getElementById('name');
         const quizHeader = document.getElementById('quizHeader').textContent;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const storedName = urlParams.get('name') || sessionStorage.getItem('user_name');
-            if (storedName) {
-                nameInput.value = storedName;
-            }
-        });
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const storedName = urlParams.get('name') || sessionStorage.getItem('user_name');
+    if (storedName) {
+        nameInput.value = storedName;
+    }
+
+    // 🔑 สร้างรหัสรอบการทำข้อสอบ (session_id) — 1 ครั้งต่อการเข้าทำ 1 รอบ
+    currentSessionId = urlParams.get('session') || sessionStorage.getItem('current_test_session') || crypto.randomUUID();
+    sessionStorage.setItem('current_test_session', currentSessionId);
+});
 
         function renderQuiz() {
             loading.classList.add('hidden');
@@ -340,7 +344,8 @@ let currentSessionId = null;
                         answers: answers,
                         experience: userExperience,
                         quiz_set: quizHeader,
-                        level: levelName // ส่งค่าระดับความรู้ไปบันทึก
+                        level: levelName 
+                        session_id: currentSessionId   // ✅ เพิ่มบรรทัดนี้
                     }]);
 
                 if (error) throw error; 
@@ -360,9 +365,7 @@ nextBtn.textContent = '✍️ ไปทำข้อสอบอัตนัย (
 nextBtn.style.backgroundColor = '#8b5cf6'; // ใช้สีม่วงเพื่อให้แตกต่าง
 nextBtn.onclick = () => {
     // ส่งชื่อและอีเมลติดตัวไปกับ URL ของหน้าข้อสอบอัตนัย (สามารถเปลี่ยนชื่อไฟล์ subjective.html เป็นหน้าอัตนัยของคุณได้เลยครับ)
-const targetUrl = `index13.html?name=${encodeURIComponent(userNameVal)}&email=${encodeURIComponent(userEmail)}&experience=${encodeURIComponent(userExperience)}&score=${score}&total=${totalQuestions}&level=${encodeURIComponent(levelName)}`;
-window.location.href = targetUrl;
-};
+const targetUrl = `index13.html?name=${encodeURIComponent(userNameVal)}&email=${encodeURIComponent(userEmail)}&experience=${encodeURIComponent(userExperience)}&score=${score}&total=${totalQuestions}&level=${encodeURIComponent(levelName)}&session=${encodeURIComponent(currentSessionId)}`;
 actionContainer.innerHTML = ''; 
 actionContainer.appendChild(nextBtn);
 
