@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>แบบทดสอบอัตนัย & ใบประกาศนียบัตร</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: #f9faff;
+            color: #333;
+            padding: 20px;
+        }
+        h2 { color: #004080; text-align: center; margin-bottom: 25px; }
+        .question-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .question h3 { color: #0059b3; font-size: 1rem; margin-bottom: 10px; }
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            font-family: 'Sarabun', sans-serif;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        textarea:focus { border-color: #007acc; box-shadow: 0 0 0 3px rgba(0, 122, 204, 0.15); }
+        button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            font-size: 1.1rem;
+            background-color: #007acc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 20px auto;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        button:hover { background-color: #005fa3; }
+        .hidden { display: none !important; }
+        
+        /* สไตล์ใบเซอร์ (Certificate) */
+        #certCard {
+            background: #ffffff;
+            border: 8px solid #004080;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .cert-title { font-size: 26px; font-weight: bold; color: #004080; margin-bottom: 5px; }
+        .cert-subtitle { font-size: 16px; color: #64748b; margin-bottom: 25px; }
+        .cert-name { font-size: 24px; font-weight: bold; color: #0284c7; border-bottom: 2px dashed #cbd5e1; display: inline-block; padding: 0 30px 5px; margin-bottom: 15px; }
+        .cert-details { text-align: left; background: #f8fafc; padding: 20px; border-radius: 8px; margin-top: 20px; font-size: 0.95rem; }
+    </style>
+</head>
+<body>
+
+    <h2 id="pageTitle">แบบทดสอบอัตนัย (สถานการณ์จำลองการขาย)</h2>
+
+    <div id="formSection">
+        <p style="text-align:center; color:#64748b; margin-bottom:20px;">กรุณาพิมพ์แนวทางการตอบข้อโต้แย้งของลูกค้าให้ครบทุกข้อ เพื่อให้ AI ทำการประเมินผล</p>
+        <div id="subjectiveFormContainer"></div>
+        <button id="submitSubjBtn" onclick="submitSubjectiveExam()">🤖 ส่งคำตอบ & ให้ AI วิเคราะห์พร้อมออกใบเซอร์</button>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingSection" class="hidden" style="text-align:center; padding:50px;">
+        <h3 style="color:#007acc;">⏳ AI กำลังวิเคราะห์คำตอบอัตนัยและสร้างใบประกาศนียบัตร...</h3>
+        <p style="color:#64748b;">กรุณารอสักครู่ ระบบกำลังบันทึกข้อมูลลงฐานข้อมูล</p>
+    </div>
+
+    <!-- ส่วนแสดงใบ Certificate -->
+    <div id="certSection" class="hidden">
+        <div id="certCard">
+            <div class="cert-title">📜 ใบประกาศนียบัตรผ่านการประเมินสมรรถนะรอบด้าน</div>
+            <div class="cert-subtitle">หลักสูตร Telesales Insurance Training & Simulation Program</div>
+            <p style="margin:0; font-size:15px; color:#333;">ขอมอบเกียรติบัตรฉบับนี้แสดงว่า</p>
+            <div class="cert-name" id="certEmpName">-</div>
+            <p id="certEmpMeta" style="margin:5px 0 20px; color:#555; font-size:14px;"></p>
+            
+            <div class="cert-details">
+                <h4 style="margin:0 0 10px; color:#004080; border-bottom:1px solid #cbd5e1; padding-bottom:5px;">📊 สรุปผลการประเมินสมรรถนะ</h4>
+                <p><strong>1. คะแนนแบบทดสอบปรนัย (ชุดที่ 12):</strong> <span id="certQuizScore">-</span></p>
+                <p><strong>2. ผลการประเมินข้อสอบอัตนัย & AI Analysis:</strong></p>
+                <div id="certAIAnalysis" style="background:#fff; padding:12px; border-radius:6px; border:1px solid #e2e8f0; font-size:0.9rem; line-height:1.5;">-</div>
+            </div>
+            
+            <p style="margin-top:30px; font-size:13px; color:#94a3b8;">ออกให้ ณ วันที่ <span id="certDate">-</span></p>
+        </div>
+
+        <button id="downloadPdfBtn" style="background:#22c55e; margin-top:20px;" onclick="downloadCertificatePDF()">📥 ดาวน์โหลดใบประกาศนียบัตร PDF</button>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        const QUESTIONS_LIST = [
+            "คำถามอัตนัยข้อที่ 1 (ไม่สนใจประกันครับ/ค่ะ)",
+            "คำถามอัตนัยข้อที่ 2 (มีประกันอยู่แล้วหลายตัว?)",
+            "คำถามอัตนัยข้อที่ 3 (ไม่อยากเพิ่มภาระประกันอีก?)",
+            "คำถามอัตนัยข้อที่ 4 (ไม่อยากซ้ำซ้อนกับของเดิม?)",
+            "คำถามอัตนัยข้อที่ 5 (ตอนนี้ไม่สะดวกคุยครับ/ค่ะ)",
+            "คำถามอัตนัยข้อที่ 6 (มีเอกสารส่งให้ดูก่อนไหม?)",
+            "คำถามอัตนัยข้อที่ 7 (ขอปรึกษาที่บ้านก่อน?)",
+            "คำถามอัตนัยข้อที่ 8 (ยังไม่ตัดสินใจครับ?)",
+            "คำถามอัตนัยข้อที่ 9 (เบี้ยแพงไปไม่มีเงินจ่าย?)",
+            "คำถามอัตนัยข้อที่ 10 (ทำแล้วยกเลิกได้ไหม?)",
+            "คำถามอัตนัยข้อที่ 11 (เคยเคลมเจ้าอื่นแล้วโดนปฏิเสธเพราะโรคที่เป็นมาก่อนทำประกัน กลัวโดนแบบเดิมอีก?)",
+            "คำถามอัตนัยข้อที่ 12 (อายุ 55 ปีแล้ว ทำประกันไปก็จ่ายเบี้ยแพง คุ้มครองไม่กี่ปีก็เสียเงินฟรี?)",
+            "คำถามอัตนัยข้อที่ 13 (ถ้าเป็นมะเร็งอยู่แต่ยังไม่รู้ตัว มาตรวจเจอหลังทำประกัน 3 เดือน บริษัทจะจ่ายไหม?)",
+            "คำถามอัตนัยข้อที่ 14 (มีประกันสุขภาพเจ้าเดิมอยู่แล้ว แผนใหม่เบี้ยแพงกว่า 2 เท่า จะซื้อเพิ่มทำไม?)",
+            "คำถามอัตนัยข้อที่ 15 (เลี้ยงเดี่ยวมีลูกเล็ก งบจำกัด เลือกได้อย่างเดียวระหว่างประกันชีวิตกับประกันสุขภาพ?)",
+            "คำถามอัตนัยข้อที่ 16 (เพื่อนเป็นตัวแทนประกันเสนอแผนคุ้มครองเยอะกว่าในราคาเท่ากัน จะซื้อกับคุณทำไม?)",
+            "คำถามอัตนัยข้อที่ 17 (ใกล้เกษียณ กลัวเบี้ยขึ้นทุกปีตามอายุ จะจ่ายไหวไหมจนต้องทิ้งกรมธรรม์กลางทาง?)",
+            "คำถามอัตนัยข้อที่ 18 (เพิ่งตรวจเจอไขมันและความดันสูงเล็กน้อย ต้องแจ้งบริษัทไหม ไม่แจ้งได้ไหม?)",
+            "คำถามอัตนัยข้อที่ 19 (ทำไมประกันสะสมทรัพย์ผลตอบแทนต่ำกว่ากองทุนรวมหรือหุ้นมาก ทำไมต้องซื้อ?)",
+            "คำถามอัตนัยข้อที่ 20 (กลัวว่าจ่ายเบี้ยหลายปีแล้ววันหนึ่งขาดส่ง เงินที่จ่ายไปทั้งหมดจะสูญเปล่าไหม?)"
+        ];
+
+        let urlParams, userName, userEmail, userExperience, quizScore, quizTotal, quizLevel;
+        let currentUserId = "anonymous";
+        let currentSessionId = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            urlParams = new URLSearchParams(window.location.search);
+            userName = urlParams.get('name') || sessionStorage.getItem('user_name') || 'ไม่ระบุชื่อ';
+            userEmail = urlParams.get('email') || sessionStorage.getItem('user_email') || 'anonymous@example.com';
+            userExperience = urlParams.get('experience') || sessionStorage.getItem('user_experience') || 'ไม่ระบุ';
+            quizScore = urlParams.get('score') || '-';
+            quizTotal = urlParams.get('total') || '60';
+            quizLevel = urlParams.get('level') || 'มาตรฐาน';
+
+            // 🔑 รับ session_id ต่อจากหน้าปรนัย ถ้าไม่มี (เข้าหน้านี้ตรง ๆ) ให้สร้างใหม่
+            currentSessionId = urlParams.get('session') || sessionStorage.getItem('current_test_session') || crypto.randomUUID();
+            sessionStorage.setItem('current_test_session', currentSessionId);
+
+            // 🔥 พยายามดึง user_id จาก Supabase Auth (แนวทางเดียวกับ index2.html)
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    currentUserId = user.id;
+                    userEmail = user.email || userEmail;
+                }
+            } catch (e) {
+                console.warn("Auth check failed, using anonymous data.", e);
+            }
+
+            renderSubjectiveForm();
+        });
+
+        function renderSubjectiveForm() {
+            const container = document.getElementById('subjectiveFormContainer');
+            QUESTIONS_LIST.forEach((qText, index) => {
+                const div = document.createElement('div');
+                div.className = 'question-container';
+                div.innerHTML = `
+                    <h3>${qText}</h3>
+                    <textarea id="subj_ans_${index}" placeholder="พิมพ์แนวทางการตอบคำโต้แย้งของลูกค้าที่นี่..."></textarea>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        window.submitSubjectiveExam = async function() {
+            // 🔥 เปลี่ยนโครงสร้าง answers เป็น object {q1:"...", q2:"...", ...}
+            // เพื่อให้ตรงกับรูปแบบข้อมูลจริงใน Supabase (แนวทางเดียวกับ index2.html)
+            const answers = {};
+            for (let i = 0; i < QUESTIONS_LIST.length; i++) {
+                const val = document.getElementById(`subj_ans_${i}`).value.trim();
+                if (!val) {
+                    alert(`กรุณากรอกคำตอบในข้อที่ ${i + 1} ให้ครบถ้วนครับ`);
+                    document.getElementById(`subj_ans_${i}`).focus();
+                    return;
+                }
+                answers[`q${i + 1}`] = val;
+            }
+
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('loadingSection').classList.remove('hidden');
+
+            // 1. จำลองหรือเรียก AI วิเคราะห์คำตอบอัตนัยผ่าน Vercel API
+            // (แปลงกลับเป็น array ชั่วคราวเฉพาะตอนส่งให้ AI วิเคราะห์ เพื่อความเข้ากันได้กับ API เดิม)
+            const answersForAI = Object.keys(answers).map((key, idx) => ({
+                questionIndex: idx + 1,
+                answer: answers[key]
+            }));
+            let aiAnalysisText = "พนักงานมีความเข้าใจหลักการตอบข้อโต้แย้ง สามารถสื่อสารเหตุผลและสร้างความเชื่อมั่นให้กับลูกค้าได้ดีเยี่ยม พร้อมแนะนำให้เน้นย้ำสิทธิประโยชน์เพิ่มเติม";
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ candidateData: { name: userName, experience: userExperience, subjectiveAnswers: answersForAI } })
+                });
+                if (response.ok) {
+                    const resJson = await response.json();
+                    if (resJson.recommendations) {
+                        aiAnalysisText = resJson.recommendations.join('<br>• ');
+                    }
+                }
+            } catch (e) {
+                console.warn("AI API fallback used:", e);
+            }
+
+            // 2. บันทึกข้อมูลลงตาราง subjective_answers ใน Supabase (พร้อม session_id)
+            // 🔥 แก้บั๊กสำคัญ: Supabase ไม่ throw error แบบ JS ปกติ ต้องดึงค่า error ออกมาเช็คเอง
+            const { error: saveError } = await supabase.from('subjective_answers').insert([{
+                user_id: currentUserId,
+                user_email: userEmail,
+                name: userName,
+                experience: userExperience,
+                answers: answers,
+                ai_analysis: { summary: aiAnalysisText },
+                session_id: currentSessionId
+            }]);
+
+            if (saveError) {
+                console.error("Supabase Save Error:", saveError);
+                document.getElementById('loadingSection').classList.add('hidden');
+                alert(`เกิดข้อผิดพลาดในการบันทึกข้อมูล: ${saveError.message}\n\nกรุณาแจ้งผู้ดูแลระบบพร้อมข้อความนี้`);
+                document.getElementById('formSection').classList.remove('hidden');
+                return;
+            }
+
+            // 3. แสดงผลหน้า Certificate
+            document.getElementById('loadingSection').classList.add('hidden');
+            document.getElementById('certSection').classList.remove('hidden');
+
+            document.getElementById('certEmpName').innerText = userName;
+            document.getElementById('certEmpMeta').innerText = `ประสบการณ์: ${userExperience} | อีเมล: ${userEmail}`;
+            document.getElementById('certQuizScore').innerText = `${quizScore} / ${quizTotal} ข้อ (ระดับ: ${quizLevel})`;
+            document.getElementById('certAIAnalysis').innerHTML = `• ${aiAnalysisText}`;
+            document.getElementById('certDate').innerText = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+        };
+
+        window.downloadCertificatePDF = function() {
+            const btn = document.getElementById('downloadPdfBtn');
+            btn.disabled = true;
+            btn.innerText = "⏳ กำลังดาวน์โหลด PDF...";
+
+            const element = document.getElementById('certCard');
+            const opt = {
+                margin: 0.3,
+                filename: `Certificate_${userName}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.disabled = false;
+                btn.innerText = "📥 ดาวน์โหลดใบประกาศนียบัตร PDF";
+            });
+        };
+    </script>
+</body>
+</html>
