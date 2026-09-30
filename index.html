@@ -108,20 +108,15 @@
           sessionStorage.setItem('user_experience', experience);
           sessionStorage.setItem('login_time', loginTime);
 
-          // 2. บันทึก/อัปเดตลงตาราง users ใน Supabase ด้วย upsert (อีเมลซ้ำ = อัปเดตแถวเดิม)
-          const { error: upsertError } = await supabase
-            .from('users')
-            .upsert(
-              {
-                email: email,
-                full_name: name,
-                emp_code: empCode,
-                department: department,
-                experience: experience,
-                login_time: loginTime
-              },
-              { onConflict: 'email' }
-            );
+          // 2. บันทึก/อัปเดตลงตาราง users ผ่านฟังก์ชัน upsert_user (security definer) ไม่ต้องเปิดสิทธิ์ตารางให้ anon
+          const { error: upsertError } = await supabase.rpc('upsert_user', {
+            p_email: email,
+            p_full_name: name,
+            p_emp_code: empCode,
+            p_department: department,
+            p_experience: experience,
+            p_login_time: loginTime
+          });
 
           if (upsertError) throw upsertError;
 
